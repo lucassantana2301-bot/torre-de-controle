@@ -1,0 +1,1565 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ArkTransp · Documentação técnica</title>
+<style>
+  :root {
+    --red: #da291c;
+    --red-deep: #b8221a;
+    --red-soft: #fdecea;
+    --ink: #111111;
+    --ink-2: #4d5459;
+    --ink-3: #636c73;
+    --line: #e3e6e8;
+    --bg: #f6f7f8;
+    --card: #ffffff;
+    --code: #f1f3f4;
+    --ok: #2a7221;
+    --warn: #8a6500;
+    --info: #1f5f8b;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink);
+    background: var(--bg);
+  }
+  .topo {
+    background: var(--red);
+    color: #fff;
+    padding: 28px 40px 24px;
+    border-bottom: 4px solid #000;
+  }
+  .topo small { text-transform: uppercase; letter-spacing: .12em; font-weight: 600; opacity: .85; }
+  .topo h1 { margin: 4px 0 6px; font-size: 32px; font-weight: 700; }
+  .topo p { margin: 0; max-width: 900px; opacity: .95; }
+  .layout { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 32px; max-width: 1320px; margin: 0 auto; padding: 32px 40px 80px; }
+  nav.indice { position: sticky; top: 16px; align-self: start; max-height: calc(100vh - 32px); overflow: auto; }
+  nav.indice h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: var(--ink-3); margin: 0 0 8px; border: 0; padding: 0; }
+  nav.indice ol { list-style: none; margin: 0; padding: 0; counter-reset: item; }
+  nav.indice li { counter-increment: item; margin: 0; }
+  nav.indice a {
+    display: block; padding: 5px 10px; border-left: 3px solid transparent;
+    color: var(--ink-2); text-decoration: none; font-size: 14px;
+  }
+  nav.indice a::before { content: counter(item) ". "; color: var(--ink-3); }
+  nav.indice a:hover { border-left-color: var(--red); color: var(--ink); background: #fff; }
+  main section {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+  }
+  h2 { font-size: 22px; margin: 0 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--red); }
+  h3 { font-size: 17px; margin: 28px 0 10px; }
+  h4 { font-size: 15px; margin: 18px 0 6px; color: var(--ink-2); }
+  h2 + h3, h2 + p + h3 { margin-top: 8px; }
+  p { margin: 0 0 12px; }
+  ul, ol { margin: 0 0 12px; padding-left: 22px; }
+  li { margin-bottom: 4px; }
+  a { color: var(--red-deep); }
+  code {
+    font-family: 'Cascadia Mono', Consolas, monospace;
+    font-size: 13px;
+    background: var(--code);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+  pre {
+    background: #111;
+    color: #f2f2f2;
+    padding: 16px 18px;
+    border-radius: 8px;
+    overflow: auto;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  pre code { background: none; padding: 0; color: inherit; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 16px; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  th { background: #fafafa; font-weight: 600; color: var(--ink-2); font-size: 13px; }
+  tr:last-child td { border-bottom: 0; }
+  td code { white-space: nowrap; }
+  .destaques { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0 4px; }
+  .destaque { border: 1px solid var(--line); border-top: 3px solid var(--red); border-radius: 8px; padding: 14px 16px; background: #fff; }
+  .destaque b { display: block; margin-bottom: 4px; }
+  .destaque span { color: var(--ink-2); font-size: 14px; }
+  .aviso { border-left: 4px solid var(--red); background: var(--red-soft); padding: 12px 16px; border-radius: 6px; margin: 12px 0; }
+  .nota { border-left: 4px solid var(--info); background: #eef5fa; padding: 12px 16px; border-radius: 6px; margin: 12px 0; }
+  .selo { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .selo.ok { background: #e6f2e4; color: var(--ok); }
+  .selo.warn { background: #fdf3d8; color: var(--warn); }
+  .selo.info { background: #e3eef6; color: var(--info); }
+  .selo.bad { background: var(--red-soft); color: var(--red-deep); }
+  .selo.neutro { background: var(--code); color: var(--ink-2); }
+
+  /* Passos numerados */
+  ol.passos { list-style: none; counter-reset: passo; padding: 0; }
+  ol.passos > li { counter-increment: passo; position: relative; padding: 2px 0 10px 40px; margin: 0; }
+  ol.passos > li::before {
+    content: counter(passo); position: absolute; left: 0; top: 0;
+    width: 26px; height: 26px; border-radius: 50%; background: var(--red); color: #fff;
+    font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+  }
+
+  /* Cartão de fonte de dados */
+  .fonte-card { border: 1px solid var(--line); border-left: 4px solid #000; border-radius: 8px; padding: 16px 20px; margin: 16px 0; }
+  .fonte-card h3 { margin-top: 0; }
+  .fonte-meta { display: grid; grid-template-columns: 160px 1fr; gap: 4px 16px; font-size: 14px; margin-bottom: 10px; }
+  .fonte-meta dt { color: var(--ink-3); font-weight: 600; }
+  .fonte-meta dd { margin: 0; }
+
+  /* Diagramas */
+  .fluxo { display: grid; grid-template-columns: 1fr 40px 1fr 40px 1fr; align-items: stretch; gap: 0; margin: 12px 0 8px; }
+  .coluna { display: flex; flex-direction: column; gap: 8px; }
+  .coluna h4 { margin: 0 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); }
+  .caixa { border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; background: #fff; font-size: 14px; }
+  .caixa small { display: block; color: var(--ink-3); font-size: 12px; }
+  .caixa.fonte { border-left: 4px solid #000; }
+  .caixa.proc { border-left: 4px solid var(--red); }
+  .caixa.tela { border-left: 4px solid var(--ok); }
+  .caixa.dados { border-left: 4px solid var(--info); background: #f7fafc; }
+  .seta { display: flex; align-items: center; justify-content: center; color: var(--red); font-size: 26px; font-weight: 700; }
+  .armazem { margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .camadas { display: flex; flex-direction: column; gap: 6px; margin: 12px 0; }
+  .camada { display: grid; grid-template-columns: 200px 1fr; gap: 12px; align-items: center; border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; background: #fff; }
+  .camada b { font-size: 14px; }
+  .camada span { color: var(--ink-2); font-size: 14px; }
+  .camada.c1 { border-left: 4px solid var(--ok); }
+  .camada.c2 { border-left: 4px solid var(--red); }
+  .camada.c3 { border-left: 4px solid #000; }
+  .camada.c4 { border-left: 4px solid var(--info); }
+  .estados { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 10px 0 14px; font-size: 14px; }
+  .estados .caixa { padding: 6px 12px; }
+  .estados .seta { font-size: 18px; }
+
+  .arvore { font-family: 'Cascadia Mono', Consolas, monospace; font-size: 13px; }
+  .grade-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  footer { text-align: center; color: var(--ink-3); font-size: 13px; margin-top: 8px; }
+
+  @media (max-width: 960px) {
+    .layout { grid-template-columns: 1fr; padding: 20px; }
+    nav.indice { position: static; max-height: none; }
+    .destaques, .grade-2 { grid-template-columns: 1fr; }
+    .fluxo { grid-template-columns: 1fr; }
+    .seta { transform: rotate(90deg); height: 32px; }
+    .camada, .fonte-meta { grid-template-columns: 1fr; }
+  }
+  @media print {
+    body { background: #fff; font-size: 12px; }
+    .topo { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .layout { display: block; padding: 0 12px; }
+    nav.indice { display: none; }
+    main section { border: 0; padding: 12px 0; break-inside: auto; }
+    h2, h3 { break-after: avoid; }
+    table, .fonte-card { break-inside: avoid; }
+    pre { white-space: pre-wrap; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <small>Arklok · Operações e Logística</small>
+  <h1>ArkTransp — Documentação técnica</h1>
+  <p>Ferramenta interna para cruzar notas fiscais entre sistemas, acompanhar entregas das transportadoras, medir SLA e apoiar a baixa de tickets no Zendesk.</p>
+  <p style="margin-top:8px; font-size:13px; opacity:.85">Responsável: Diogo Silva · Atualizado em 15/10/2026 · <a href="index.html" style="color:#fff">Voltar ao guia do sistema</a></p>
+</header>
+
+<div class="layout">
+  <nav class="indice" aria-label="Índice">
+    <h2>Índice</h2>
+    <ol>
+      <li><a href="#visao">Visão geral</a></li>
+      <li><a href="#rotina">Rotina de uso</a></li>
+      <li><a href="#arquitetura">Arquitetura</a></li>
+      <li><a href="#tecnologia">Tecnologia e como rodar</a></li>
+      <li><a href="#seguranca">Segurança e privacidade</a></li>
+      <li><a href="#importacao">Como a importação funciona</a></li>
+      <li><a href="#fontes">Fontes de dados</a></li>
+      <li><a href="#cruzamento">Cruzamento Alloca07 × Intelipost</a></li>
+      <li><a href="#entregas">Situação de entrega</a></li>
+      <li><a href="#sla">SLA, regiões e dias úteis</a></li>
+      <li><a href="#telas">Telas</a></li>
+      <li><a href="#banco">Banco de dados acumulado</a></li>
+      <li><a href="#dados">Estrutura de dados</a></li>
+      <li><a href="#armazenamento">Onde os dados ficam</a></li>
+      <li><a href="#exportacoes">Arquivos exportados</a></li>
+      <li><a href="#codigo">Código e manutenção</a></li>
+      <li><a href="#glossario">Glossário</a></li>
+      <li><a href="#limitacoes">Limitações</a></li>
+      <li><a href="#migracao">Migração para o servidor</a></li>
+      <li><a href="#evolucoes">Possíveis evoluções</a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+    <!-- 1 ================================================================ -->
+    <section id="visao">
+      <h2>1. Visão geral</h2>
+      <p>O ArkTransp substitui o trabalho manual de cruzar planilhas no Excel. A equipe exporta relatórios dos sistemas que já usa (Alloca07/Protheus, Intelipost, portais das transportadoras e Zendesk), arrasta os arquivos para o app e ele faz os cruzamentos, mostra as pendências e gera as planilhas de saída.</p>
+
+      <h3>Problemas que resolve</h3>
+      <ul>
+        <li><b>Nota que não chegou na Intelipost:</b> sem integração, a entrega não é rastreada nem cobrada da transportadora.</li>
+        <li><b>Ticket aberto com entrega já feita:</b> o ticket do Zendesk fica parado em "Em rota de entrega" mesmo com todas as NFs entregues.</li>
+        <li><b>Atraso sem visibilidade:</b> não havia um número único de "% entregue no prazo" por transportadora e região.</li>
+        <li><b>Conferência de listas:</b> validar uma lista de NFs (ex.: Alloca08) contra as entregas levava horas de PROCV.</li>
+      </ul>
+
+      <h3>O que cada tela entrega</h3>
+      <table>
+        <thead><tr><th>Tela</th><th>Pergunta que responde</th></tr></thead>
+        <tbody>
+          <tr><td><b>Início</b></td><td>O que preciso resolver hoje, e quais planilhas ainda faltam enviar?</td></tr>
+          <tr><td><b>Integrações de NF</b></td><td>Toda nota emitida na Alloca07 chegou na Intelipost?</td></tr>
+          <tr><td><b>Baixa Zendesk</b></td><td>Quais tickets já podem ser fechados porque todas as NFs foram entregues?</td></tr>
+          <tr><td><b>Entregas</b></td><td>As NFs desta lista foram entregues, e dentro do prazo?</td></tr>
+          <tr><td><b>Painel</b></td><td>Qual é o SLA de cada transportadora e região, e onde estão os atrasos?</td></tr>
+          <tr><td><b>Banco de dados</b> (topo)</td><td>Como estava cada nota ao longo do mês? (histórico acumulado e exportação)</td></tr>
+        </tbody>
+      </table>
+
+      <div class="destaques">
+        <div class="destaque"><b>Sem servidor</b><span>Site estático (HTML + JavaScript). As planilhas são lidas e os dados ficam guardados no navegador da máquina do usuário.</span></div>
+        <div class="destaque"><b>Sem internet</b><span>Nenhuma API, telemetria, fonte ou script externo. Uma política de segurança bloqueia conexões fora do próprio app.</span></div>
+        <div class="destaque"><b>Entrada por arquivo</b><span>Não integra com os sistemas de origem: tudo entra por planilha exportada manualmente (.xlsx, .xls, .csv).</span></div>
+      </div>
+    </section>
+
+    <!-- 2 ================================================================ -->
+    <section id="rotina">
+      <h2>2. Rotina de uso</h2>
+      <p>Sequência típica do dia. A tela <b>Início</b> mostra o checklist "Planilhas do dia" com o horário de envio de cada arquivo e avisa o que falta.</p>
+      <ol class="passos">
+        <li><b>Alloca07 + Intelipost</b> (botão "Enviar Alloca07 e Intelipost"). Monta o cruzamento e libera as outras telas. O app reconhece sozinho qual arquivo é qual.</li>
+        <li><b>Transações da Intelipost</b> e, se houver, <b>SPfly, Jamef e Certex</b> (tela Entregas). Dão a situação de entrega de cada NF. A Jamef só exporta 30 dias por vez, então dá para somar vários arquivos.</li>
+        <li><b>Tickets do Zendesk</b> e <b>NF dos romaneios</b> (tela Baixa Zendesk). Ligam cada ticket às suas NFs.</li>
+        <li><b>Relatório de Expedição</b> (opcional, tela Painel). Usado só para o lead time (saída da Arklok até a entrega).</li>
+        <li>Trabalhar as <b>Prioridades</b> do Início: dar baixa nos tickets prontos, cobrar atrasos e tratar notas não integradas.</li>
+        <li>Opcional: <b>Planilha base</b> na tela Entregas, para conferir uma lista específica de NFs.</li>
+      </ol>
+      <div class="nota">O app guarda tudo sozinho no <b>Banco de dados</b> poucos segundos depois de cada envio. Não existe botão "salvar".</div>
+    </section>
+
+    <!-- 3 ================================================================ -->
+    <section id="arquitetura">
+      <h2>3. Arquitetura</h2>
+      <p>É um <b>aplicativo de página única (SPA)</b> que roda inteiro no navegador. Não há backend, banco de dados em servidor nem chamadas de rede: o "servidor" só entrega os arquivos estáticos.</p>
+
+      <div class="camadas">
+        <div class="camada c1"><b>Telas (React)</b><span><code>src/pages</code> e <code>src/components</code>. Leem os dados por hooks e se atualizam sozinhas quando algo muda.</span></div>
+        <div class="camada c2"><b>Regras e cruzamentos</b><span><code>src/reconcile.ts</code>, <code>src/hooks</code> e <code>src/services/sla.ts</code>. São funções puras: entram dados e saem resultados, sem efeito colateral.</span></div>
+        <div class="camada c3"><b>Importadores e stores</b><span><code>src/services/*Import.ts</code>. Leem a planilha, convertem em objetos e guardam num "store" do módulo.</span></div>
+        <div class="camada c4"><b>Armazenamento local</b><span><b>localStorage</b> (dados do dia e preferências) e <b>IndexedDB</b> (banco acumulado e Relatório de Expedição).</span></div>
+      </div>
+
+      <h3>Padrão de store</h3>
+      <p>Cada fonte de dados tem um módulo com o mesmo desenho (ex.: <code>zendeskImport.ts</code>, <code>entregasImport.ts</code>, <code>tratativaService.ts</code>):</p>
+      <ul>
+        <li>uma variável do módulo com o estado atual, carregada do armazenamento ao abrir o app;</li>
+        <li>um conjunto de "ouvintes" avisados a cada alteração;</li>
+        <li>funções <code>set…()</code> que gravam no armazenamento e avisam os ouvintes;</li>
+        <li>um hook <code>use…()</code> baseado em <code>useSyncExternalStore</code> do React, usado pelas telas.</li>
+      </ul>
+      <p>O estado global de interface (filtros, tema, menu, avisos e notas do cruzamento) fica no <code>AppContext</code>.</p>
+
+      <h3>Modo "dia antigo" (somente leitura)</h3>
+      <p>O módulo <code>diaAtivo.ts</code> permite abrir os dados como estavam num dia salvo. Com um dia antigo aberto:</p>
+      <ul>
+        <li>os stores devolvem os dados daquele dia em vez dos de hoje (função <code>visivel()</code>);</li>
+        <li>qualquer gravação é bloqueada por <code>bloquearSeHistorico()</code> com a mensagem "Volte para Hoje para alterar dados";</li>
+        <li>o topo mostra o aviso "Vendo dd/mm · Voltar para hoje".</li>
+      </ul>
+
+      <h3>Roteamento</h3>
+      <p>Roteamento por <b>hash</b> (<code>#/rota?parametros</code>), em <code>src/router/useRouter.ts</code>. Funciona em qualquer hospedagem estática sem configurar o servidor. Filtros vão na URL (ex.: <code>#/integrations?status=pending</code>), então um link copiado abre a mesma visão.</p>
+      <table>
+        <thead><tr><th>Rota</th><th>Tela</th></tr></thead>
+        <tbody>
+          <tr><td><code>#/dashboard</code></td><td>Início (padrão)</td></tr>
+          <tr><td><code>#/integrations</code>, <code>#/integrations/NF-123</code></td><td>Integrações de NF e detalhe de uma nota</td></tr>
+          <tr><td><code>#/zendesk</code></td><td>Baixa Zendesk</td></tr>
+          <tr><td><code>#/entregas</code> (ou <code>#/conferir</code>)</td><td>Entregas</td></tr>
+          <tr><td><code>#/painel</code></td><td>Painel de SLA</td></tr>
+          <tr><td><code>#/compasse</code>, <code>#/reports</code>, <code>#/settings</code></td><td>Compasse, Relatórios, Configurações</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 4 ================================================================ -->
+    <section id="tecnologia">
+      <h2>4. Tecnologia e como rodar</h2>
+      <table>
+        <thead><tr><th>Item</th><th>Versão</th><th>Uso</th></tr></thead>
+        <tbody>
+          <tr><td><b>React</b> + <b>React DOM</b></td><td>19.1</td><td>Interface</td></tr>
+          <tr><td><b>TypeScript</b></td><td>5.8</td><td>Tipagem do código</td></tr>
+          <tr><td><b>Vite</b> + <code>@vitejs/plugin-react</code></td><td>6.3 / 4.5</td><td>Servidor de desenvolvimento e build</td></tr>
+          <tr><td><b>SheetJS</b> (<code>xlsx</code>)</td><td>0.20.3</td><td>Leitura e geração de planilhas Excel/CSV no navegador. Instalado do CDN oficial da SheetJS (a versão do npm está desatualizada).</td></tr>
+          <tr><td><b>CSS puro</b> (<code>src/styles.css</code>)</td><td>—</td><td>Visual no padrão de identidade Arklok 2024, com tema claro e escuro</td></tr>
+        </tbody>
+      </table>
+      <p>As únicas dependências de execução são <code>react</code>, <code>react-dom</code> e <code>xlsx</code>. Não há biblioteca de gráficos: os gráficos do Painel são SVG próprios, em <code>src/components/charts/BiCharts.tsx</code>.</p>
+
+      <h3>Como rodar</h3>
+      <p>Pré-requisito: Node.js 20 ou superior.</p>
+<pre><code>npm install       # instala as dependências (única etapa que acessa a internet)
+npm run dev       # servidor local em http://localhost:5173
+npm run build     # checa os tipos (tsc -b) e gera a versão estática em dist/
+npm run preview   # serve a pasta dist/ localmente</code></pre>
+      <ul>
+        <li>O servidor de desenvolvimento escuta só em <code>localhost</code>, então não fica acessível para outras máquinas da rede.</li>
+        <li>A pasta <code>dist/</code> pode ser publicada em qualquer hospedagem estática (IIS, Nginx, SharePoint, Vercel etc.). Mesmo publicado, os dados continuam no navegador de cada usuário.</li>
+        <li>Esta documentação fica em <code>docs/index.html</code> e abre com o servidor rodando em <code>http://localhost:5173/docs/</code>, ou com dois cliques no arquivo.</li>
+      </ul>
+
+      <h3>Navegadores</h3>
+      <p>Recomendado <b>Chrome ou Edge</b> atualizados. Gravar exportações direto numa pasta escolhida usa a File System Access API, que só existe nesses dois. Nos outros navegadores o arquivo é baixado normalmente.</p>
+    </section>
+
+    <!-- 5 ================================================================ -->
+    <section id="seguranca">
+      <h2>5. Segurança e privacidade</h2>
+      <h3>Content-Security-Policy</h3>
+      <p>Definida em <code>vite.config.ts</code> e injetada como <code>&lt;meta http-equiv="Content-Security-Policy"&gt;</code> no <code>index.html</code>. O navegador recusa qualquer coisa fora destas regras.</p>
+      <table>
+        <thead><tr><th>Diretiva</th><th>Valor</th><th>Efeito</th></tr></thead>
+        <tbody>
+          <tr><td><code>default-src</code></td><td><code>'self'</code></td><td>Por padrão, só recursos do próprio endereço</td></tr>
+          <tr><td><code>script-src</code></td><td><code>'self'</code> (em dev também <code>'unsafe-inline'</code>, exigido pelo React Refresh)</td><td>Nenhum script de terceiros</td></tr>
+          <tr><td><code>connect-src</code></td><td><code>'self'</code> (em dev também o WebSocket do localhost)</td><td>Nenhuma chamada de rede para outro servidor</td></tr>
+          <tr><td><code>img-src</code> / <code>font-src</code></td><td><code>'self' data:</code> (imagens também <code>blob:</code>)</td><td>Sem imagens ou fontes externas</td></tr>
+          <tr><td><code>form-action</code></td><td><code>'none'</code></td><td>Nenhum formulário pode enviar dados</td></tr>
+          <tr><td><code>object-src</code></td><td><code>'none'</code></td><td>Sem plugins embutidos</td></tr>
+          <tr><td><code>base-uri</code></td><td><code>'self'</code></td><td>Impede redirecionar caminhos relativos</td></tr>
+        </tbody>
+      </table>
+      <p>O <code>index.html</code> também tem <code>&lt;meta name="referrer" content="no-referrer"&gt;</code>.</p>
+
+      <h3>Dados tratados</h3>
+      <ul>
+        <li>Número de NF, chave, pedido, romaneio e contrato.</li>
+        <li>Nome do cliente ou destinatário, cidade e UF de destino.</li>
+        <li>Número do ticket, organização e grupo econômico do Zendesk.</li>
+        <li>Nome do recebedor da entrega (vem da planilha da transportadora).</li>
+        <li>Comentários de tratativa digitados pela equipe.</li>
+      </ul>
+      <p>Nada sai da máquina, exceto quando o usuário exporta uma planilha.</p>
+
+      <h3>Acesso</h3>
+      <ul>
+        <li><b>Não há login.</b> Os dados estão no perfil do navegador: quem usa a máquina e o perfil tem acesso a eles.</li>
+        <li>Para apagar tudo, use "Limpar dados do site" no navegador. Antes, exporte o banco (Banco de dados → banco completo).</li>
+        <li>A pasta escolhida para exportações fica registrada no navegador (IndexedDB). O navegador pede permissão de novo quando necessário.</li>
+      </ul>
+    </section>
+
+    <!-- 6 ================================================================ -->
+    <section id="importacao">
+      <h2>6. Como a importação funciona</h2>
+      <div class="fluxo">
+        <div class="coluna">
+          <h4>Arquivos exportados</h4>
+          <div class="caixa fonte">Alloca07 / Protheus</div>
+          <div class="caixa fonte">Intelipost<small>relatório de envios e de transações</small></div>
+          <div class="caixa fonte">SPfly · Jamef · Certex</div>
+          <div class="caixa fonte">Zendesk<small>tickets e NF dos romaneios</small></div>
+          <div class="caixa fonte">Relatório de Expedição</div>
+          <div class="caixa fonte">Planilha base de NFs</div>
+        </div>
+        <div class="seta">→</div>
+        <div class="coluna">
+          <h4>Importadores e regras</h4>
+          <div class="caixa proc">Cruzamento<small>parse.ts · workbookImport.ts · reconcile.ts</small></div>
+          <div class="caixa proc">Entregas<small>entregasImport.ts</small></div>
+          <div class="caixa proc">Zendesk<small>zendeskImport.ts</small></div>
+          <div class="caixa proc">Expedição<small>expedicaoImport.ts</small></div>
+          <div class="caixa proc">Planilha base<small>conferenciaImport.ts · useConferencia.ts</small></div>
+          <div class="caixa proc">SLA e regiões<small>sla.ts</small></div>
+        </div>
+        <div class="seta">→</div>
+        <div class="coluna">
+          <h4>Telas</h4>
+          <div class="caixa tela">Integrações de NF</div>
+          <div class="caixa tela">Entregas</div>
+          <div class="caixa tela">Baixa Zendesk</div>
+          <div class="caixa tela">Painel de SLA</div>
+          <div class="caixa tela">Início</div>
+          <div class="caixa tela">Banco de dados / Exportar</div>
+        </div>
+      </div>
+      <div class="armazem">
+        <div class="caixa dados"><b>localStorage</b><small>notas do cruzamento, planilhas de entrega, Zendesk, planilha base, tratativas, histórico de importações, preferências</small></div>
+        <div class="caixa dados"><b>IndexedDB</b><small>banco acumulado por mês, resumo diário, Relatório de Expedição, pasta de exportação</small></div>
+      </div>
+
+      <h3>Etapas de cada importador</h3>
+      <ol class="passos">
+        <li><b>Leitura</b> do arquivo com SheetJS, direto da memória: nada é enviado a lugar nenhum.</li>
+        <li><b>Achar o cabeçalho.</b> O importador percorre as primeiras linhas (de 10 a 30, conforme a fonte) até achar as colunas obrigatórias. Assim funcionam relatórios com título ou linhas em branco no topo.</li>
+        <li><b>Normalizar os nomes das colunas:</b> minúsculas, sem acento, e tudo que não é letra ou número vira espaço. <code>"Dt. Emissão"</code> vira <code>"dt emissao"</code>.</li>
+        <li><b>Converter as linhas</b> em objetos tipados: datas em <code>aaaa-mm-dd</code> e NF sem zeros à esquerda.</li>
+        <li><b>Descartar linhas</b> conforme a regra da fonte (ex.: reversas, envios cancelados, tickets em outros status).</li>
+        <li><b>Gravar</b> no store e no armazenamento local. As telas se atualizam na hora.</li>
+      </ol>
+
+      <h3>Prévia antes de gravar</h3>
+      <p>Na importação pelo Início (<code>importacoes.ts</code>), o arquivo é lido e mostrado numa prévia antes de substituir os dados atuais:</p>
+      <div class="estados">
+        <span class="caixa">Lendo</span><span class="seta">→</span>
+        <span class="caixa">Prévia</span><span class="seta">→</span>
+        <span class="caixa">Aplicando</span><span class="seta">→</span>
+        <span class="caixa">Concluído</span>
+        <span style="color:var(--ink-3)">(ou Erro, em qualquer etapa)</span>
+      </div>
+      <p>A prévia mostra os números (linhas aceitas, descartadas, NFs diferentes), o período do arquivo, as 5 primeiras linhas e estes avisos automáticos:</p>
+      <ul>
+        <li>o mesmo arquivo já foi enviado hoje (enviar de novo substitui, não duplica);</li>
+        <li>o arquivo novo tem <b>menos da metade</b> dos registros do atual, um possível período incompleto;</li>
+        <li>a data mais recente do arquivo é de <b>mais de 7 dias</b> atrás;</li>
+        <li>o nome do arquivo cita outra transportadora (ex.: arquivo "Jamef" enviado no campo da SPfly);</li>
+        <li>a NF dos romaneios foi enviada antes da planilha de tickets.</li>
+      </ul>
+      <p>Cada importação, com sucesso ou erro, entra no histórico <code>arklok_importacoes_v1</code> (últimas 300).</p>
+
+      <h3>Regras gerais de leitura</h3>
+      <table>
+        <thead><tr><th>Assunto</th><th>Regra</th></tr></thead>
+        <tbody>
+          <tr><td><b>Número da NF</b></td><td>Fica só com os dígitos e tira zeros à esquerda: <code>000235084</code> = <code>235084</code>. O número do ticket segue a mesma regra.</td></tr>
+          <tr><td><b>Datas</b></td><td>Aceita número de série do Excel, <code>dd/mm/aaaa</code>, <code>d/m/aa</code>, <code>aaaa-mm-dd</code> e hora opcional (<code>hh:mm</code>). Texto com barra é sempre lido como <b>dia/mês</b>, nunca no formato americano.</td></tr>
+          <tr><td><b>Datas trocadas das transportadoras</b></td><td>Nas planilhas da SPfly, Jamef e Certex, datas com dia ≤ 12 chegam como data do Excel com dia e mês invertidos (ex.: 08/10 vira 10/08). O importador desfaz a inversão, exceto em colunas no formato <code>aaaa-mm-dd</code>, que já vêm certas.</td></tr>
+          <tr><td><b>Planilha com área errada</b></td><td>Algumas exportações de ERP gravam uma dimensão menor que a área preenchida. O app recalcula a área real a partir das células (<code>usedRange</code> em <code>parse.ts</code>).</td></tr>
+          <tr><td><b>CSV</b></td><td>O separador (<code>;</code> ou <code>,</code>) é detectado pela primeira linha. Aceita campos entre aspas com quebra de linha dentro. A codificação tenta UTF-8 e, se falhar, Windows-1252 (padrão do Excel em português).</td></tr>
+          <tr><td><b>Várias NFs numa célula</b></td><td>Só na planilha base: <code>"123 / 456"</code> ou <code>"123,456"</code> viram duas NFs (blocos de 3 dígitos ou mais).</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 7 ================================================================ -->
+    <section id="fontes">
+      <h2>7. Fontes de dados</h2>
+      <p>Os nomes de coluna abaixo já estão normalizados (minúsculas e sem acento). As colunas marcadas como obrigatórias identificam a planilha. As demais são lidas quando existem.</p>
+
+      <div class="fonte-card">
+        <h3>7.1 Alloca07 (Protheus)</h3>
+        <dl class="fonte-meta">
+          <dt>Origem</dt><dd>Protheus, rotina Alloca07, aba "Listagem do Browse". Formato .xlsx, .xls ou .csv.</dd>
+          <dt>Tela</dt><dd>Integrações de NF (botão "Enviar Alloca07 e Intelipost")</dd>
+          <dt>Reconhecimento</dt><dd>Cabeçalho nas 13 primeiras linhas, com <code>nota fiscal</code> e pelo menos uma de <code>tp previsao</code>, <code>nome dest</code>, <code>dt emissao</code>, <code>romaneio</code>. Se o arquivo tiver várias abas válidas, usa a que tiver mais linhas.</dd>
+          <dt>Código</dt><dd><code>parse.ts</code> (detecção) e <code>reconcile.ts → fromAlloca</code></dd>
+        </dl>
+        <table>
+          <thead><tr><th>Coluna</th><th>Campo</th><th>Observação</th></tr></thead>
+          <tbody>
+            <tr><td><code>nota fiscal</code></td><td>nf</td><td>Obrigatória. Linhas sem NF são contadas e ignoradas.</td></tr>
+            <tr><td><code>nf triangula</code></td><td>nfTriangular</td><td>NF da operação triangular (mesma carga com outro número)</td></tr>
+            <tr><td><code>tp previsao</code></td><td>tipo</td><td>Sustentação, Implantação, Substituição, Remanejamento Fiscal…</td></tr>
+            <tr><td><code>dt emissao</code> / <code>data emissao</code></td><td>emissao</td><td>Define o mês da nota e o corte do dia</td></tr>
+            <tr><td><code>nome dest</code></td><td>cliente</td><td></td></tr>
+            <tr><td><code>mun destino</code>, <code>uf destino</code></td><td>cidade, uf</td><td></td></tr>
+            <tr><td><code>romaneio</code>, <code>pedido</code>, <code>contrato</code>, <code>termo</code>, <code>serie nf</code>, <code>prev entr</code></td><td>—</td><td>Dados de apoio</td></tr>
+          </tbody>
+        </table>
+        <p>A mesma NF pode aparecer em várias linhas (uma por item). Elas são agrupadas numa nota só, e a NF triangular vem da primeira linha que a tiver.</p>
+      </div>
+
+      <div class="fonte-card">
+        <h3>7.2 Intelipost (relatório de envios)</h3>
+        <dl class="fonte-meta">
+          <dt>Origem</dt><dd>Portal Intelipost, relatório de pedidos/envios</dd>
+          <dt>Tela</dt><dd>Integrações de NF (enviado junto com a Alloca07)</dd>
+          <dt>Reconhecimento</dt><dd><code>nota fiscal</code> e pelo menos uma de <code>transportadora</code>, <code>status transportador</code>, <code>codigo de rastreio</code>, <code>nome do destinatario</code></dd>
+          <dt>Código</dt><dd><code>reconcile.ts → fromIntel</code></dd>
+        </dl>
+        <table>
+          <thead><tr><th>Coluna</th><th>Campo</th></tr></thead>
+          <tbody>
+            <tr><td><code>nota fiscal</code></td><td>nf (obrigatória). Se a NF se repete, vale a primeira linha.</td></tr>
+            <tr><td><code>transportadora</code>, <code>codigo de rastreio</code>, <code>metodo de envio</code></td><td>transportadora, rastreio, método</td></tr>
+            <tr><td><code>data criacao</code></td><td>criacao: vira a <b>data de integração</b> da nota</td></tr>
+            <tr><td><code>nome do destinatario</code>, <code>cidade do destinatario</code>, <code>uf</code></td><td>destino</td></tr>
+            <tr><td><code>status transportador</code>, <code>situacao</code>, <code>data despacho</code>, <code>data entrega</code>, <code>previsao entrega cliente</code></td><td>Lidos, mas a situação de entrega vem das transações (7.3)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="fonte-card">
+        <h3>7.3 Transações da Intelipost</h3>
+        <dl class="fonte-meta">
+          <dt>Origem</dt><dd>Portal Intelipost, exportação de transações (<code>transactions_*.xlsx</code>). Traz todas as transportadoras numa planilha só.</dd>
+          <dt>Tela</dt><dd>Entregas (cartão "Transações Intelipost")</dd>
+          <dt>Reconhecimento</dt><dd>Cabeçalho nas 10 primeiras linhas, com <code>nota fiscal</code> e <code>status transportador</code></dd>
+          <dt>Código</dt><dd><code>entregasImport.ts → importTransacoesFile</code></dd>
+        </dl>
+        <table>
+          <thead><tr><th>Coluna</th><th>Campo</th></tr></thead>
+          <tbody>
+            <tr><td><code>status transportador</code> + <code>microstatus</code></td><td>ultimoStatus, no formato "Status · Microstatus" quando os dois são diferentes</td></tr>
+            <tr><td><code>data entrega</code></td><td>dataEntrega: só preenchida quando o status começa com "Entregue"</td></tr>
+            <tr><td><code>previsao entrega cliente</code> (ou <code>previsao entrega transp</code>)</td><td>previsao</td></tr>
+            <tr><td><code>data do ultimo status</code></td><td>dataStatus</td></tr>
+            <tr><td><code>transportadora</code>, <code>hub agencia</code></td><td>transportadora e base de saída (ex.: RJ, CE, GO)</td></tr>
+            <tr><td><code>nome do destinatario</code>, <code>cidade do destinatario</code>, <code>uf</code></td><td>destino</td></tr>
+            <tr><td><code>data criacao</code></td><td>Define o período do arquivo</td></tr>
+          </tbody>
+        </table>
+        <p>Envios <b>cancelados</b> são contados, mas não valem como entrega nem como rota.</p>
+      </div>
+
+      <div class="fonte-card">
+        <h3>7.4 Planilhas das transportadoras (SPfly, Jamef, Certex)</h3>
+        <dl class="fonte-meta">
+          <dt>Origem</dt><dd>SPfly e Certex: <code>Relatorio_Entrega_*.csv</code>. Jamef: <code>JCENTREGA_*.xlsx</code> (máximo de 30 dias por arquivo).</dd>
+          <dt>Tela</dt><dd>Entregas (um cartão por transportadora). Também alimentam o Painel de SLA.</dd>
+          <dt>Reconhecimento</dt><dd>Cabeçalho nas 15 primeiras linhas, com <code>nf</code>/<code>nota fiscal</code> e <code>data entrega</code>/<code>data de entrega</code>/<code>data realizacao</code></dd>
+          <dt>Vários arquivos</dt><dd>Botão "Adicionar" soma um período novo ao já carregado. Eventos idênticos entram uma vez só (<code>juntarTransportadora</code>).</dd>
+          <dt>Código</dt><dd><code>entregasImport.ts → importTransportadoraFile</code></dd>
+        </dl>
+        <table>
+          <thead><tr><th>Coluna</th><th>Campo</th></tr></thead>
+          <tbody>
+            <tr><td><code>ultimo status</code> / <code>status</code></td><td>ultimoStatus</td></tr>
+            <tr><td><code>data entrega</code> (+ <code>hora entrega</code>)</td><td>dataEntrega</td></tr>
+            <tr><td><code>prev entrega</code> / <code>previsao entrega</code> / <code>data previsao</code></td><td>previsao: a base do SLA</td></tr>
+            <tr><td><code>data status</code> (+ <code>hora status</code>)</td><td>dataStatus</td></tr>
+            <tr><td><code>recebedor</code>, <code>destinatario</code></td><td>quem recebeu e para quem foi</td></tr>
+            <tr><td><code>municipio entrega</code>/<code>cidade destino</code>, <code>uf entrega</code>/<code>estado destino</code></td><td>Destino. Sem essas colunas, usa as colunas CIDADE/UF que vêm <b>depois</b> do destinatário (as primeiras são do remetente).</td></tr>
+            <tr><td><code>data emissao nf</code> / <code>data emissao cte</code></td><td>Define o período do arquivo. Sem ela, o período é pela data de entrega.</td></tr>
+          </tbody>
+        </table>
+        <ul>
+          <li><b>Descartadas:</b> linhas com serviço "reversa" e retornos ao CD (destinatário com "Arklok" <b>e</b> cidade Itapevi). Entregas para filiais Arklok continuam.</li>
+          <li><b>Jamef (relatório de CT-e):</b> <code>data realizacao</code> também é preenchida em reentregas, por isso só conta como entrega quando o status diz "entrega realizada" ou "entregue".</li>
+          <li>Uma NF com várias linhas vira um histórico de eventos (<code>porNf[nf] = [evento1, evento2…]</code>), não um registro duplicado.</li>
+        </ul>
+      </div>
+
+      <div class="fonte-card">
+        <h3>7.5 Tickets do Zendesk</h3>
+        <dl class="fonte-meta">
+          <dt>Origem</dt><dd>Zendesk Explore, relatório "Aging – Acompanhamento de tickets não resolvidos" (.xlsx), exportado em inglês ou em português</dd>
+          <dt>Tela</dt><dd>Baixa Zendesk</dd>
+          <dt>Reconhecimento</dt><dd><code>ticket id</code> (ou <code>id do ticket</code>) nas 15 primeiras linhas. A coluna de status personalizado é obrigatória.</dd>
+          <dt>Filtro</dt><dd>Só guarda tickets com status <b>"Em rota de entrega"</b> ou <b>"Aguardando expedição"</b>. Os demais são contados como "em outros status".</dd>
+          <dt>Código</dt><dd><code>zendeskImport.ts → importZendeskFile</code></dd>
+        </dl>
+        <table>
+          <thead><tr><th>Coluna (inglês / português)</th><th>Campo</th></tr></thead>
+          <tbody>
+            <tr><td><code>ticket custom status name</code> / <code>nome do status personalizado do ticket</code></td><td>status → aba</td></tr>
+            <tr><td><code>ticket group</code> / <code>grupo de tickets</code></td><td>grupo</td></tr>
+            <tr><td><code>ticket organization name</code> / <code>nome da organizacao do ticket</code></td><td>organizacao</td></tr>
+            <tr><td><code>ticket created date</code>, <code>ticket updated timestamp</code></td><td>criadoEm, atualizadoEm</td></tr>
+            <tr><td><code>unsolved tickets age days</code>, <code>… time since update days</code></td><td>idadeDias, diasSemAtualizacao</td></tr>
+            <tr><td><code>grupo economico name</code>, <code>estado uf</code>, <code>localidade</code>, <code>prioridade padrao do cliente</code></td><td>campos personalizados</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="fonte-card">
+        <h3>7.6 NF dos romaneios</h3>
+        <dl class="fonte-meta">
+          <dt>Origem</dt><dd>Planilha interna de romaneios, aba <code>Base_Dados</code></dd>
+          <dt>Tela</dt><dd>Baixa Zendesk. É ela que liga ticket e NF em todo o app.</dd>
+          <dt>Reconhecimento</dt><dd>Coluna que começa com <code>chamado</code> ou <code>ticket</code>, mais a coluna <code>nf</code>/<code>nota fiscal</code>. Opcionais: <code>romaneio</code>, <code>data romaneio…</code>, <code>etapa…</code>.</dd>
+          <dt>Desempenho</dt><dd>O arquivo tem abas enormes. O importador lê uma aba por vez, começando pelas que têm "base" no nome.</dd>
+          <dt>Espaço</dt><dd>Se não couber no navegador, guarda só os tickets da planilha do Zendesk atual (marcada como "filtrado"). Ao trocar a planilha de tickets, é preciso reenviar esta.</dd>
+          <dt>Código</dt><dd><code>zendeskImport.ts → importNfFile</code></dd>
+        </dl>
+      </div>
+
+      <div class="fonte-card">
+        <h3>7.7 Relatório de Expedição</h3>
+        <dl class="fonte-meta">
+          <dt>Origem</dt><dd>Base de expedição da Arklok (cerca de 20 mil linhas), em .csv ou .xlsx</dd>
+          <dt>Tela</dt><dd>Painel (lead time). É opcional.</dd>
+          <dt>Reconhecimento</dt><dd><code>nota fiscal</code> e <code>data saida</code> nas 15 primeiras linhas</dd>
+          <dt>Colunas</dt><dd><code>uf</code>, <code>transportadora</code>, <code>modal</code>, <code>tipo</code>, <code>cliente</code></dd>
+          <dt>Duplicadas</dt><dd>Se a NF aparece mais de uma vez, vale a última linha</dd>
+          <dt>Armazenamento</dt><dd>IndexedDB (<code>arklok_expedicao</code>), por ser grande demais para o localStorage</dd>
+          <dt>Código</dt><dd><code>expedicaoImport.ts</code></dd>
+        </dl>
+      </div>
+
+      <div class="fonte-card">
+        <h3>7.8 Planilha base (conferência de NFs)</h3>
+        <dl class="fonte-meta">
+          <dt>Origem</dt><dd>Qualquer lista com coluna de NF: Alloca08, "Exportar todos" da Baixa Zendesk, lista recebida por e-mail…</dd>
+          <dt>Tela</dt><dd>Entregas</dd>
+          <dt>Reconhecimento</dt><dd>Primeira coluna, nas 30 primeiras linhas, chamada <code>nota fiscal</code>, <code>notas fiscais</code>, <code>nf</code>, <code>nfs</code>, <code>nfe</code>, <code>numero da nf</code> ou <code>nº nf</code></dd>
+          <dt>Código</dt><dd><code>conferenciaImport.ts</code></dd>
+        </dl>
+        <table>
+          <thead><tr><th>Coluna opcional</th><th>Reconhecida por</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><td>Ticket</td><td>contém "zendesk", "ticket" ou "chamado"</td><td>Baixa em massa e busca</td></tr>
+            <tr><td>Organização</td><td>contém "organiza", "cliente" ou "destinatario"</td><td>Coluna exibida quando não há tipo</td></tr>
+            <tr><td>Tipo</td><td><code>tp previsao</code> / <code>tipo de previsao</code></td><td>Filtro por tipo; substitui a coluna Organização</td></tr>
+            <tr><td>Emissão</td><td><code>dt emissao</code> / <code>data de emissao</code> / <code>… nf</code></td><td>Filtro por mês e período de emissão</td></tr>
+            <tr><td>Cidade / UF</td><td><code>mun destino</code>, <code>municipio</code>, <code>cidade</code> / <code>uf destino</code>, <code>estado</code></td><td>Região da linha (senão vem da planilha de entrega)</td></tr>
+          </tbody>
+        </table>
+        <p>Linhas com ticket e sem NF são contadas como "sem NF". Ao adicionar uma coluna nova no importador, é preciso reenviar a planilha ("Trocar") para o app passar a lê-la.</p>
+      </div>
+    </section>
+
+    <!-- 8 ================================================================ -->
+    <section id="cruzamento">
+      <h2>8. Cruzamento Alloca07 × Intelipost</h2>
+      <p>Regra central da tela Integrações de NF, em <code>src/reconcile.ts</code> (função <code>reconcile</code>). Para cada nota da Alloca07, na ordem:</p>
+      <ol class="passos">
+        <li><b>Tipo "REMANEJAMENTO FISCAL"</b> (sem diferenciar acento ou maiúscula): sai do cruzamento. É contada à parte como "Fora por remanejamento".</li>
+        <li><b>Emitida hoje</b> (data de emissão ≥ hoje, no fuso de São Paulo): sai do cruzamento, porque ainda não teve tempo de integrar.</li>
+        <li><b>NF encontrada na Intelipost:</b> <span class="selo ok">Integrada</span>, validação <b>direta</b>.</li>
+        <li><b>NF triangular encontrada na Intelipost:</b> <span class="selo ok">Integrada</span>, validação <b>triangular</b>.</li>
+        <li>Nenhuma das duas: <span class="selo warn">Não integrada</span>.</li>
+      </ol>
+      <p>Depois, cada NF da Intelipost que não foi usada por nenhuma nota da Alloca07 (nem como principal nem como triangular) e não foi criada hoje vira <span class="selo info">Só Intelipost</span>.</p>
+      <p>As notas de remanejamento e as emitidas hoje também "consomem" a NF correspondente na Intelipost, para que ela não apareça como "Só Intelipost".</p>
+
+      <h3>Outras regras da tela</h3>
+      <table>
+        <thead><tr><th>Regra</th><th>Detalhe</th></tr></thead>
+        <tbody>
+          <tr><td><b>Corte do dia</b></td><td>Além do passo 2, a lista exibida remove qualquer nota com data (emissão ou criação na Intelipost) igual ou posterior a hoje (<code>integrationService.operationalIntegrations</code>). Com um dia antigo aberto, o "hoje" passa a ser aquele dia.</td></tr>
+          <tr><td><b>Data anormal</b></td><td>Nota integrada cuja data de integração é diferente da data de emissão (<code>utils/anomalia.ts</code>). Tem filtro "só anormais".</td></tr>
+          <tr><td><b>Taxa de integração</b></td><td>Integradas ÷ (integradas + não integradas). "Só Intelipost" fica fora da conta.</td></tr>
+          <tr><td><b>Tratativa</b></td><td>Cada nota pode receber PDV, nota antiga, nota nova e comentários com data e hora. Salvar marca a nota como tratada. As tratativas ficam numa chave própria e <b>sobrevivem a novas importações</b>.</td></tr>
+          <tr><td><b>Ticket</b></td><td>Com as planilhas do Zendesk carregadas, cada nota mostra os tickets abertos cujo romaneio tem a NF ou a triangular. Tem filtro "com ticket aberto / sem ticket".</td></tr>
+        </tbody>
+      </table>
+      <p><b>Filtros da lista:</b> abas por status (Todas, Integradas, Não integradas, Só Intelipost); tipo da nota (seleção múltipla); mês, "emissão de" e "emissão até" (pela emissão; sem ela, pela data de integração); tratativa; ticket; só anormais; e busca por NF, triangular, cliente, tipo ou rastreio.</p>
+    </section>
+
+    <!-- 9 ================================================================ -->
+    <section id="entregas">
+      <h2>9. Situação de entrega de uma NF</h2>
+      <p>Usada nas telas Entregas, Baixa Zendesk e Início. Código em <code>entregasImport.ts → entregaDaNf</code>.</p>
+
+      <h3>9.1 Pelas transações da Intelipost</h3>
+      <ol>
+        <li>Existe evento com data de entrega e que não é devolução: <b>entregue</b>.</li>
+        <li>Senão, existe evento com "devolu" no status: <b>devolvida</b>.</li>
+        <li>Senão, todos os envios estão cancelados: <b>sem rastreio</b> (aparece como "Só envio cancelado").</li>
+        <li>Senão: <b>em trânsito</b>, com o evento mais recente.</li>
+        <li>NF ausente das transações: <b>sem rastreio</b>.</li>
+      </ol>
+
+      <h3>9.2 Pelas planilhas das transportadoras</h3>
+      <p>Procura a NF na SPfly, depois na Jamef e depois na Certex. Se alguma tem entrega, a NF é <b>entregue</b>. Senão, vale a primeira em que a NF aparece, como <b>devolvida</b> ou <b>em trânsito</b>.</p>
+
+      <h3>9.3 Juntando as duas fontes</h3>
+      <p>As duas fontes valem juntas. Fica a situação <b>mais avançada</b>, nesta ordem de prioridade:</p>
+      <div class="estados">
+        <span class="selo ok">entregue</span><span class="seta">›</span>
+        <span class="selo ok">mesmo dia</span><span class="seta">›</span>
+        <span class="selo warn">devolvida</span><span class="seta">›</span>
+        <span class="selo info">em trânsito</span><span class="seta">›</span>
+        <span class="selo bad">sem rastreio</span>
+      </div>
+      <p>Em caso de empate, vale a transação. Os campos que faltam numa fonte vêm da outra: recebedor, previsão, cidade, UF e base.</p>
+
+      <h3>9.4 NF triangular e modais próprios</h3>
+      <ul>
+        <li>Se a NF principal não está entregue, o app consulta também a <b>NF triangular</b> e fica com a mais avançada (é a mesma carga).</li>
+        <li><b>Frota interna</b> e <b>Lalamove</b> (pelo nome da transportadora) contam como entregues quando o status é de entrega. Sem esse status, ficam numa situação própria, fora de "não entregue".</li>
+      </ul>
+    </section>
+
+    <!-- 10 =============================================================== -->
+    <section id="sla">
+      <h2>10. SLA, regiões e dias úteis</h2>
+      <p>Código em <code>src/services/sla.ts</code>. O SLA compara a <b>data de entrega</b> com a <b>previsão de entrega informada pela transportadora</b>. Não existe tabela de prazos contratados.</p>
+
+      <h3>Situações</h3>
+      <table>
+        <thead><tr><th>Situação</th><th>Regra (nesta ordem)</th><th>Conta no %?</th></tr></thead>
+        <tbody>
+          <tr><td><span class="selo warn">Devolução</span></td><td>Último status contém "devolu"</td><td>Não</td></tr>
+          <tr><td><span class="selo neutro">Sem previsão</span></td><td>A transportadora não informou previsão</td><td>Não</td></tr>
+          <tr><td><span class="selo ok">Entregue no prazo</span></td><td>Data de entrega ≤ previsão</td><td>Sim (numerador)</td></tr>
+          <tr><td><span class="selo bad">Entregue com atraso</span></td><td>Data de entrega &gt; previsão. Atraso = dias úteis entre previsão e entrega (mínimo 1).</td><td>Sim</td></tr>
+          <tr><td><span class="selo info">Em trânsito no prazo</span></td><td>Sem entrega e previsão ≥ hoje</td><td>Não</td></tr>
+          <tr><td><span class="selo bad">Vencida sem entrega</span></td><td>Sem entrega e previsão &lt; hoje. Atraso = dias úteis entre previsão e hoje (mínimo 1).</td><td>Sim</td></tr>
+        </tbody>
+      </table>
+      <p><b>% dentro do SLA</b> = no prazo ÷ (no prazo + com atraso + vencidas), com uma casa decimal. Meta: <b>95%</b>. Cores: verde ≥ 95%, amarelo ≥ 85%, vermelho abaixo de 85%.</p>
+      <p>Na tela <b>Entregas</b>, uma linha da planilha base com várias NFs assume a situação da <b>pior</b> NF (vencida › atrasada › em trânsito › devolução › sem previsão › no prazo). O filtro "Dentro do SLA" reúne <i>no prazo</i> e <i>em trânsito no prazo</i>; o filtro "Fora do SLA" reúne <i>com atraso</i> e <i>vencida</i>.</p>
+
+      <h3>Dias úteis</h3>
+      <p>Função <code>diasUteis(de, ate)</code>: conta os dias de segunda a sexta depois de <code>de</code> até <code>ate</code>, inclusive. Retorna negativo se <code>ate</code> vier antes. <b>Feriados não são considerados.</b> O "hoje" é a data atual no fuso <code>America/Sao_Paulo</code>; com um dia antigo aberto, é a data daquele dia.</p>
+
+      <h3>Regiões</h3>
+      <p>Região do IBGE pela <b>UF de destino</b> (<code>regiaoDe</code>). Capital e Grande São Paulo ficam no Sudeste.</p>
+      <table>
+        <thead><tr><th>Região</th><th>UFs</th></tr></thead>
+        <tbody>
+          <tr><td>Sudeste</td><td>SP, RJ, MG, ES</td></tr>
+          <tr><td>Sul</td><td>PR, SC, RS</td></tr>
+          <tr><td>Centro-Oeste</td><td>DF, GO, MT, MS</td></tr>
+          <tr><td>Nordeste</td><td>BA, SE, AL, PE, PB, RN, CE, PI, MA</td></tr>
+          <tr><td>Norte</td><td>AM, PA, AP, RR, RO, AC, TO</td></tr>
+          <tr><td>Sem UF</td><td>UF vazia ou desconhecida</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Base do Painel (<code>calcularSla</code>)</h3>
+      <ul>
+        <li>Usa as planilhas da <b>SPfly, Jamef e Certex</b>, que são as que trazem previsão. As transações da Intelipost não entram no Painel.</li>
+        <li>Para cada NF, o evento usado é o de entrega (que não seja devolução) ou, se não houver, o mais recente.</li>
+        <li>NFs com destinatário "Arklok" (coletas e retornos) ficam fora do SLA e são contadas como "retornos à Arklok".</li>
+        <li><b>Lead time</b> = dias úteis entre a <b>saída</b> no Relatório de Expedição e a entrega. A expedição só é ligada à NF quando a UF de destino bate, porque o mesmo número de NF pode existir em emitentes diferentes.</li>
+      </ul>
+    </section>
+
+    <!-- 11 =============================================================== -->
+    <section id="telas">
+      <h2>11. Telas</h2>
+
+      <h3>11.1 Topo (todas as telas)</h3>
+      <table>
+        <thead><tr><th>Elemento</th><th>Função</th></tr></thead>
+        <tbody>
+          <tr><td><b>Busca global</b> (<kbd>Ctrl</kbd>+<kbd>K</kbd>)</td><td>A partir de 2 caracteres. Com número, procura NF/triangular nas notas e tickets pelo número ou pela NF do romaneio. Com texto, procura cliente nas notas e organização/grupo econômico nos tickets. Mostra até 5 notas e 4 tickets, mais atalhos "Buscar em" para Integrações, Entregas e Baixa Zendesk.</td></tr>
+          <tr><td><b>Período de emissão</b></td><td>Calendário que filtra notas e entregas pela data de emissão em todas as telas. Fica guardado só enquanto a aba está aberta (<code>sessionStorage</code>).</td></tr>
+          <tr><td><b>Banco de dados</b></td><td>Banco acumulado por mês, verificação, exportações e resumo diário (seção 12)</td></tr>
+          <tr><td><b>Menu ⚙</b></td><td>"Ver dados de" (abrir um dia antigo), pasta dos arquivos exportados, tema claro/escuro, recarregar dados e "Como funciona"</td></tr>
+        </tbody>
+      </table>
+
+      <h3>11.2 Início <code>#/dashboard</code></h3>
+      <ul>
+        <li><b>Cartões:</b> notas no período (e % integradas), pendências de integração, % entregues (entre as notas com transportadora rastreável), entregas atrasadas e tickets do Zendesk abertos e prontos para baixa. Cada cartão leva à lista correspondente.</li>
+        <li><b>Prioridades</b>, na ordem em que aparecem:
+          <ol>
+            <li>tickets prontos para dar baixa;</li>
+            <li>entregas atrasadas, ou seja, em trânsito com previsão já vencida;</li>
+            <li>notas não integradas;</li>
+            <li>notas sem envio nas transações (ou fora da planilha da transportadora);</li>
+            <li>tickets com romaneio sem NF;</li>
+            <li>notas só na Intelipost.</li>
+          </ol>
+        </li>
+        <li><b>Entregas por transportadora:</b> notas, entregues, em rota, atrasadas e sem rastreio por grupo (SPfly, Jamef, Certex, Frota interna, Lalamove, Outras, Sem transportadora). "Sem transportadora" fica fora do %.</li>
+        <li><b>Planilhas do dia:</b> cada planilha aparece como "Hoje hh:mm", "De dd/mm" (antiga), "Falta enviar" ou "Opcional". As que faltam ou estão antigas geram o aviso "Atualize hoje" no topo da tela.</li>
+      </ul>
+
+      <h3>11.3 Integrações de NF <code>#/integrations</code></h3>
+      <p>Regras na seção 8. Ações: <b>Exportar CSV</b> (NF, empresa, tipo, PDV, nota antiga, nota nova e último comentário) e <b>Enviar Alloca07 e Intelipost</b>. Clicar numa nota abre o detalhe (<code>#/integrations/NF-…</code>) com dados operacionais, transporte e o painel de tratativa.</p>
+
+      <h3>11.4 Baixa Zendesk <code>#/zendesk</code></h3>
+      <table>
+        <thead><tr><th>Aba</th><th>Conteúdo</th></tr></thead>
+        <tbody>
+          <tr><td>Em rota de entrega / Aguardando expedição</td><td>Tickets naquele status no Zendesk</td></tr>
+          <tr><td><b>Já entregues — dar baixa</b></td><td>Tickets "prontos": <b>todas</b> as linhas do romaneio têm NF <b>e</b> todas essas NFs estão entregues. Os parcialmente entregues ficam de fora e são contados num aviso.</td></tr>
+          <tr><td>Frota interna / Lalamove</td><td>Tickets com pelo menos uma NF desses modais</td></tr>
+        </tbody>
+      </table>
+      <ul>
+        <li><b>Situação da NF</b> do ticket: <span class="selo ok">Com NF</span> (todas as linhas do romaneio têm NF), <span class="selo warn">Sem NF</span> (falta NF em alguma linha; aparece como "Parcial · x de y" se só parte tem), <span class="selo bad">Fora da planilha</span> (ticket sem romaneio na planilha de NF).</li>
+        <li><b>Busca</b> por ticket, NF, romaneio, organização, grupo econômico, UF ou transportadora. A lista vem ordenada do ticket mais antigo para o mais novo.</li>
+        <li><b>Ações:</b> Copiar NFs (formato <code>123,456,789</code>), Baixa em massa, Exportar (a aba atual) e Exportar todos.</li>
+      </ul>
+
+      <h3>11.5 Entregas <code>#/entregas</code></h3>
+      <p>Cartões de upload: planilha base, Transações Intelipost, SPfly, Jamef e Certex. Cada linha da planilha base é cruzada NF a NF com a situação de entrega (seção 9). Se a NF não está entre as integradas, é procurada direto nas planilhas de entrega.</p>
+      <table>
+        <thead><tr><th>Resultado da linha</th><th>Regra</th></tr></thead>
+        <tbody>
+          <tr><td><span class="selo ok">Todas entregues</span></td><td>Todas as NFs da linha entregues</td></tr>
+          <tr><td><span class="selo info">Parte entregue</span></td><td>Algumas entregues, outras não</td></tr>
+          <tr><td><span class="selo neutro">Frota / Lalamove</span></td><td>Nenhuma entregue e pelo menos uma de frota interna ou Lalamove</td></tr>
+          <tr><td><span class="selo bad">Não encontradas</span></td><td>Nenhuma NF aparece em nenhuma fonte de entrega</td></tr>
+          <tr><td><span class="selo warn">Não entregues</span></td><td>Demais casos: em trânsito, devolvidas ou só com envio cancelado</td></tr>
+        </tbody>
+      </table>
+      <ul>
+        <li><b>Filtros:</b> busca por NF ou ticket, tipo (seleção múltipla), emissão de/até, região, situação de SLA e mês (ao lado de "Copiar NFs").</li>
+        <li><b>Quadro "% no prazo por região"</b> com os filtros de tipo e emissão aplicados.</li>
+        <li><b>Barra de contagem</b> com o "% dentro do SLA" e o número de linhas avaliadas.</li>
+        <li><b>Colunas:</b> ticket, resultado, NF, situação, transportadora, previsão, data de entrega, SLA (com dias úteis de atraso), tipo ou organização, região com cidade/UF, e emissão.</li>
+        <li><b>Ações:</b> Copiar NFs, Baixa em massa (se houver coluna de ticket) e Exportar Excel.</li>
+      </ul>
+
+      <h3>11.6 Painel de SLA <code>#/painel</code></h3>
+      <ul>
+        <li><b>Filtros:</b> transportadora, região e mês da <b>previsão</b>. Os cartões e as fatias do gráfico também filtram por situação.</li>
+        <li><b>Indicadores:</b> % dentro do SLA, notas monitoradas, entregues no prazo, com atraso (e atraso médio), vencidas e lead time médio.</li>
+        <li><b>Gráficos:</b>
+          <ul>
+            <li>medidor do SLA geral;</li>
+            <li>rosca com a situação das notas;</li>
+            <li>barras empilhadas por transportadora;</li>
+            <li>% no prazo por região;</li>
+            <li>tendência semanal: últimas 12 semanas, agrupadas pela segunda-feira da semana da previsão. Semanas com menos de 5 notas avaliadas não mostram %;</li>
+            <li>cidades com mais problemas: as 8 com mais atrasos e vencidas;</li>
+            <li>lead time médio por região.</li>
+          </ul>
+        </li>
+        <li><b>Tickets em atraso sem entrega:</b> NFs vencidas ligadas a tickets abertos do Zendesk, ordenadas pelo maior atraso. A tela mostra até 100, e é possível copiar os IDs ou exportar. Exige as duas planilhas do Zendesk.</li>
+        <li><b>Detalhe das notas:</b> até 300 linhas na tela, ordenadas por gravidade (vencida › atrasada › em trânsito › devolução › sem previsão › no prazo) e depois pelo maior atraso. Busca por NF, destinatário, cidade ou UF. O botão Exportar leva todas as linhas.</li>
+      </ul>
+
+      <h3>11.7 Outras telas</h3>
+      <table>
+        <thead><tr><th>Tela</th><th>Conteúdo</th></tr></thead>
+        <tbody>
+          <tr><td><b>Relatórios</b> <code>#/reports</code></td><td>CSV de todas as notas do cruzamento e CSV só das pendências (não integradas e só Intelipost), respeitando o período de emissão do topo</td></tr>
+          <tr><td><b>Configurações</b> <code>#/settings</code></td><td><b>Geral:</b> tema, atualização automática (desligada, 15, 30 ou 60 s) e "Limpar base", que apaga só as notas da Alloca07 × Intelipost. <b>Como funciona:</b> explica as situações de cada tela para o usuário final.</td></tr>
+          <tr><td><b>Compasse</b> <code>#/compasse</code></td><td>Em construção</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 12 =============================================================== -->
+    <section id="banco">
+      <h2>12. Banco de dados acumulado</h2>
+      <p>Código em <code>src/services/bancoDiario.ts</code>, armazenado no IndexedDB <code>arklok_banco</code>. Guarda um histórico que <b>só cresce</b>: uma planilha nova atualiza o que mudou e mantém o que não veio nela.</p>
+
+      <h3>Quando grava</h3>
+      <p><b>Automaticamente</b>, 3 segundos depois de qualquer mudança nos dados carregados (função <code>acumularHoje</code>, disparada pelo topo). Não grava com um dia antigo aberto nem quando não há dados. As notas emitidas hoje ficam de fora, como no resto do app.</p>
+
+      <h3>Como grava</h3>
+      <ol class="passos">
+        <li>Monta as mesmas 6 tabelas do "Exportar geral": Notas, Tratativas, Zendesk_Tickets, Zendesk_NF, Entregas, Transportadoras.</li>
+        <li>Agrupa as linhas pela <b>chave</b> da tabela. Cada chave vira um registro.</li>
+        <li>Compara com o que já está no banco: registro novo entra, registro alterado é atualizado e registro igual não é regravado.</li>
+        <li>Guarda <code>primeiraVez</code> (quando apareceu) e <code>ultimaAtualizacao</code> (quando mudou).</li>
+        <li>Grava o <b>resumo do dia</b>: quantidade de linhas por tabela e situação das entregas.</li>
+      </ol>
+      <table>
+        <thead><tr><th>Tabela</th><th>Chave</th><th>Mês do registro</th></tr></thead>
+        <tbody>
+          <tr><td>Notas</td><td>nota_fiscal</td><td>Mês da emissão</td></tr>
+          <tr><td>Entregas</td><td>nota_fiscal</td><td>Mês da emissão</td></tr>
+          <tr><td>Tratativas</td><td>nota_fiscal</td><td>Mês de emissão da nota; senão, mês do comentário</td></tr>
+          <tr><td>Zendesk_Tickets</td><td>id_zendesk</td><td>Mês de criação do ticket</td></tr>
+          <tr><td>Zendesk_NF</td><td>id_zendesk</td><td>Mês de criação do ticket; senão, data do romaneio</td></tr>
+          <tr><td>Transportadoras</td><td>transportadora + nota_fiscal</td><td>Mês de emissão da NF; senão, mês da entrega, do status ou da previsão</td></tr>
+        </tbody>
+      </table>
+      <p>Sem data, o registro vai para o grupo "Sem data".</p>
+
+      <h3>Ações da janela "Banco de dados"</h3>
+      <ul>
+        <li><b>Banco acumulado por mês:</b> notas e entregas por mês. Exporta um mês ou o banco completo, com as colunas extras <code>mes_base</code>, <code>primeira_vez_vista</code> e <code>ultima_atualizacao</code>.</li>
+        <li><b>Exportar dados carregados agora:</b> uma aba por tabela, só com o que está no app no momento.</li>
+        <li><b>Guardar e limpar para nova importação:</b> grava no banco e esvazia as planilhas do dia (notas, Zendesk, transportadoras e transações). O banco e as tratativas continuam.</li>
+        <li><b>Verificar banco:</b> procura problemas e oferece limpeza.
+          <ul>
+            <li>Itens que podem ser apagados sem perda: registros de tabelas antigas, registros vazios, chave que não é número, linhas repetidas, entregas sem a nota, NFs de romaneio de tickets nunca acompanhados, fotos de dias órfãs e chaves velhas do navegador.</li>
+            <li>Itens que só geram aviso: comentários de notas que não estão no banco, registros com mês no futuro (data lida com dia e mês trocados), notas emitidas depois de integradas, notas sem data de emissão e armazenamento do navegador acima de ~4 MB.</li>
+          </ul>
+        </li>
+        <li><b>Resumo diário:</b> contagens de cada dia em que houve gravação.</li>
+      </ul>
+      <div class="nota">Dias antigos com "foto completa" (store <code>snapshots</code>) podem ser reabertos em "Ver dados de", somente para consulta. As versões atuais gravam apenas o resumo diário; as fotos são de versões anteriores.</div>
+    </section>
+
+    <!-- 13 =============================================================== -->
+    <section id="dados">
+      <h2>13. Estrutura de dados</h2>
+      <p>Convenção de datas interna: texto <code>aaaa-mm-dd</code> ou <code>aaaa-mm-ddThh:mm</code>, em horário local. Nos Excel exportados, as datas viram data de verdade do Excel, com formato <code>dd/mm/aaaa</code>.</p>
+
+      <h3>13.1 <code>Integration</code>: nota do cruzamento (<code>src/types/index.ts</code>)</h3>
+      <table>
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td><code>id</code></td><td>string</td><td><code>NF-&lt;número&gt;</code></td></tr>
+          <tr><td><code>name</code></td><td>string</td><td><code>NF 123 · Cliente</code></td></tr>
+          <tr><td><code>status</code></td><td>enum</td><td><code>completed</code> (integrada), <code>pending</code> (não integrada), <code>intelipost_only</code></td></tr>
+          <tr><td><code>createdAt</code></td><td>ISO</td><td>Emissão (meio-dia) para notas da Alloca07; criação na Intelipost para "só Intelipost"</td></tr>
+          <tr><td><code>responsible</code></td><td>string</td><td>Transportadora (integradas) ou "Alloca07"</td></tr>
+          <tr><td><code>description</code>, <code>errorMessage</code></td><td>string</td><td>Explicação do resultado do cruzamento</td></tr>
+          <tr><td><code>metadata.notaFiscal</code>, <code>nfTriangular</code></td><td>string</td><td>Números da NF principal e da triangular</td></tr>
+          <tr><td><code>metadata.validacao</code></td><td>enum</td><td><code>direta</code> ou <code>triangular</code></td></tr>
+          <tr><td><code>metadata.presenca</code></td><td>enum</td><td><code>both</code>, <code>alloca_only</code> ou <code>intelipost_only</code></td></tr>
+          <tr><td><code>metadata.tipoNota</code></td><td>string</td><td>"Tp. Previsão" da Alloca07</td></tr>
+          <tr><td><code>metadata.dataEmissao</code></td><td>aaaa-mm-dd</td><td>Emissão na Alloca07</td></tr>
+          <tr><td><code>metadata.dataIntegracao</code></td><td>aaaa-mm-ddThh:mm</td><td>Criação na Intelipost</td></tr>
+          <tr><td><code>metadata.clienteDestino</code>, <code>cidade</code>, <code>uf</code>, <code>romaneio</code>, <code>pedido</code>, <code>contrato</code></td><td>string</td><td>Dados da Alloca07 (ou da Intelipost, para "só Intelipost")</td></tr>
+          <tr><td><code>metadata.transportadora</code>, <code>rastreio</code></td><td>string</td><td>Dados da Intelipost</td></tr>
+        </tbody>
+      </table>
+      <p>Campos como <code>type</code>, <code>category</code>, <code>retryCount</code>, <code>endpoint</code> e <code>durationMs</code> vêm do modelo inicial do projeto e não têm papel no cruzamento.</p>
+
+      <h3>13.2 <code>EventoTransportadora</code>: uma linha de entrega (<code>entregasImport.ts</code>)</h3>
+      <table>
+        <thead><tr><th>Campo</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td><code>ultimoStatus</code>, <code>dataStatus</code></td><td>Último status informado e quando</td></tr>
+          <tr><td><code>previsao</code></td><td>Previsão de entrega (aaaa-mm-dd)</td></tr>
+          <tr><td><code>dataEntrega</code></td><td>Data e hora da entrega. Vazio se não entregue.</td></tr>
+          <tr><td><code>recebedor</code>, <code>destinatario</code>, <code>cidade</code>, <code>uf</code></td><td>Destino e quem recebeu</td></tr>
+          <tr><td><code>transportadora</code>, <code>base</code></td><td>Só nas transações da Intelipost</td></tr>
+        </tbody>
+      </table>
+      <p>Cada planilha de entrega vira <code>{ fileName, importadoEm, totalLinhas, periodo, porNf: Record&lt;NF, EventoTransportadora[]&gt; }</code>.</p>
+
+      <h3>13.3 Demais tipos</h3>
+      <table>
+        <thead><tr><th>Tipo</th><th>Arquivo</th><th>Conteúdo</th></tr></thead>
+        <tbody>
+          <tr><td><code>EntregaNf</code></td><td>entregasImport.ts</td><td><code>{ nf, situacao, transportadora, evento, modal? }</code>. Situação: entregue, mesmo_dia, devolvida, em_transito ou sem_rastreio.</td></tr>
+          <tr><td><code>EntregaNota</code></td><td>entregasImport.ts</td><td>Nota integrada com a entrega: NF, triangular, emissão, cliente, destino, grupo da transportadora, situação (entregue, não entregue, frota, lalamove, sem rastreio) e tickets</td></tr>
+          <tr><td><code>LinhaConferencia</code></td><td>conferenciaImport.ts</td><td>Linha da planilha base: <code>{ ticket, nfs[], organizacao, tipo?, emissao?, cidade?, uf? }</code></td></tr>
+          <tr><td><code>LinhaResultado</code></td><td>useConferencia.ts</td><td>LinhaConferencia + <code>itens[{ nf, entrega }]</code> + <code>resultado</code></td></tr>
+          <tr><td><code>ZendeskTicket</code></td><td>zendeskImport.ts</td><td>id, status, aba, grupo, organização, grupo econômico, UF, localidade, prioridade, datas, idade</td></tr>
+          <tr><td><code>NfImport</code></td><td>zendeskImport.ts</td><td><code>porTicket: Record&lt;ticket, { romaneio, dataRomaneio, nf | null, etapa }[]&gt;</code></td></tr>
+          <tr><td><code>ExpedicaoNota</code></td><td>expedicaoImport.ts</td><td><code>{ saida, uf, transportadora, modal, tipo, cliente }</code> por NF</td></tr>
+          <tr><td><code>NotaSla</code></td><td>sla.ts</td><td>NF, transportadora, região, destino, previsão, entrega, status, atraso, lead time, expedição</td></tr>
+          <tr><td><code>Tratativa</code></td><td>tratativaService.ts</td><td><code>{ tratado, tratadoEm, pdv?, notaAntiga?, notaNova?, comentarios[{ id, texto, criadoEm }] }</code></td></tr>
+          <tr><td><code>Execucao</code></td><td>importacoes.ts</td><td>Registro do histórico de importações: fonte, arquivo, data, sucesso/erro, números e período</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 14 =============================================================== -->
+    <section id="armazenamento">
+      <h2>14. Onde os dados ficam</h2>
+      <div class="aviso">Tudo fica <b>no navegador</b> do usuário, separado por perfil do Chrome/Edge e por endereço do site. <code>localhost:5173</code> e o endereço publicado são bancos diferentes. Limpar os dados do site apaga tudo.</div>
+
+      <h3>localStorage (limite de ~5 MB por site)</h3>
+      <table>
+        <thead><tr><th>Chave</th><th>Conteúdo</th></tr></thead>
+        <tbody>
+          <tr><td><code>arklok_integrations_v3</code></td><td>Notas do cruzamento Alloca07 × Intelipost (lista de <code>Integration</code>)</td></tr>
+          <tr><td><code>arklok_reconcile_revision</code></td><td>Marca de que há uma base enviada pelo usuário (<code>user-upload-v6</code>)</td></tr>
+          <tr><td><code>arklok_cruzamento_info_v1</code></td><td>Arquivos e horário do último envio da Alloca07/Intelipost</td></tr>
+          <tr><td><code>arklok_tratativas_v1</code></td><td>Tratativas por nota (chave <code>NF-…</code>)</td></tr>
+          <tr><td><code>arklok_entregas_transacoes_v1</code></td><td>Transações da Intelipost</td></tr>
+          <tr><td><code>arklok_entregas_spfly_v1</code>, <code>_jamef_v1</code>, <code>_certex_v1</code></td><td>Planilhas das transportadoras</td></tr>
+          <tr><td><code>arklok_entregas_base_v1</code></td><td>Planilha base da tela Entregas</td></tr>
+          <tr><td><code>arklok_entregas_rota_v1</code></td><td>Planilha de rota (legado, sem uso nas telas atuais)</td></tr>
+          <tr><td><code>arklok_zendesk_tickets_v1</code></td><td>Tickets do Zendesk</td></tr>
+          <tr><td><code>arklok_zendesk_nf_v1</code></td><td>NF dos romaneios, em formato compacto (cada linha é um array, para caber)</td></tr>
+          <tr><td><code>arklok_importacoes_v1</code></td><td>Histórico de importações (até 300; reduz para 50 se faltar espaço)</td></tr>
+          <tr><td><code>arklok_theme</code>, <code>arklok_sidebar_collapsed</code>, <code>arklok_menu_abertos</code></td><td>Preferências de tela</td></tr>
+          <tr><td><code>arklok_executions_v1</code>, <code>arklok_logs_v1</code></td><td>Dados de exemplo do modelo inicial (detalhe da nota)</td></tr>
+        </tbody>
+      </table>
+      <p><b>sessionStorage:</b> <code>arklok_periodo_emissao</code> guarda o período de emissão do topo enquanto a aba estiver aberta.</p>
+      <p>Quando uma planilha não cabe no localStorage, o app avisa. Na planilha base, os dados valem só até recarregar a página. Nas transportadoras e transações, aparece a mensagem para usar "Verificar banco" e liberar espaço.</p>
+
+      <h3>IndexedDB (sem limite prático)</h3>
+      <table>
+        <thead><tr><th>Banco</th><th>Store (chave)</th><th>Conteúdo</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="4"><code>arklok_banco</code> (versão 2)</td><td><code>base</code> (<code>id</code>; índice <code>mes</code>)</td><td>Registros do banco acumulado: <code>{ id: "Tabela|chave", tabela, chave, mes, linhas[][], primeiraVez, ultimaAtualizacao }</code></td></tr>
+          <tr><td><code>tabelas</code> (<code>nome</code>)</td><td>Cabeçalho (colunas) de cada tabela</td></tr>
+          <tr><td><code>dias</code> (<code>data</code>)</td><td>Resumo diário: <code>{ data, salvoEm, registros, entregas, temEstado? }</code></td></tr>
+          <tr><td><code>snapshots</code> (<code>data</code>)</td><td>Fotos completas de dias antigos, que podem ser reabertas</td></tr>
+          <tr><td><code>arklok_expedicao</code></td><td><code>base</code> (registro <code>atual</code>)</td><td>Relatório de Expedição</td></tr>
+          <tr><td><code>arklok_pastas</code></td><td><code>handles</code> (registro <code>exportGeral</code>)</td><td>Pasta escolhida para gravar as exportações</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 15 =============================================================== -->
+    <section id="exportacoes">
+      <h2>15. Arquivos exportados</h2>
+      <table>
+        <thead><tr><th>Arquivo</th><th>Onde</th><th>Conteúdo</th></tr></thead>
+        <tbody>
+          <tr><td><code>arktransp_base_AAAA-MM-DD.xlsx</code></td><td>Banco de dados → dados carregados agora</td><td>Aba Resumo + Notas, Tratativas, Zendesk_Tickets, Zendesk_NF, Entregas, Transportadoras</td></tr>
+          <tr><td><code>arktransp_banco_AAAA-MM.xlsx</code><br><code>arktransp_banco_completo_AAAA-MM-DD.xlsx</code></td><td>Banco de dados → mês / banco completo</td><td>As mesmas abas, com <code>mes_base</code>, <code>primeira_vez_vista</code> e <code>ultima_atualizacao</code></td></tr>
+          <tr><td><code>arklok-integracoes-&lt;número&gt;.csv</code></td><td>Integrações de NF → Exportar CSV</td><td>NF, empresa, tipo, PDV, nota antiga, nota nova, comentário (separador <code>;</code>)</td></tr>
+          <tr><td><code>integracoes_nf_….csv</code>, <code>pendencias_nf_….csv</code></td><td>Relatórios</td><td>Notas do cruzamento com status, tipo, emissão, integração, transportadora, rastreio e destino</td></tr>
+          <tr><td><code>entregas_&lt;filtro&gt;_….xlsx</code></td><td>Entregas → Exportar</td><td>Uma linha por NF: resultado, situação, transportadora, base, status, entrega, recebedor, tipo/organização, emissão, previsão, SLA, atraso, região, cidade, UF</td></tr>
+          <tr><td><code>baixaMassa_&lt;filtro&gt;_….xlsx</code></td><td>Baixa Zendesk e Entregas</td><td>Aba <code>Tickets</code> com a coluna única <code>id_zendesk</code> (modelo de baixa em massa do Zendesk)</td></tr>
+          <tr><td><code>zendesk_ticket_log_…</code>, <code>zendesk_&lt;aba&gt;_…</code>, <code>zendesk_todos_….xlsx</code></td><td>Baixa Zendesk → Exportar / Exportar todos</td><td>Tickets com NFs, transportadora, status e entrega</td></tr>
+          <tr><td><code>sla_transportadoras_&lt;filtro&gt;_….xlsx</code></td><td>Painel → Exportar</td><td>NF, transportadora, região, destino, saída, previsão, entrega, situação, atraso, lead time, dados da expedição</td></tr>
+          <tr><td><code>tickets_em_atraso_….xlsx</code></td><td>Painel → Tickets em atraso</td><td>Ticket, NF, transportadora, região, destino, previsão, atraso, status</td></tr>
+        </tbody>
+      </table>
+      <p>As exportações do Banco de dados vão para a <b>pasta escolhida</b> no menu ⚙ (Chrome/Edge). As demais são baixadas na pasta Downloads. Os CSVs começam com BOM UTF-8 para o Excel abrir os acentos certos.</p>
+    </section>
+
+    <!-- 16 =============================================================== -->
+    <section id="codigo">
+      <h2>16. Código e manutenção</h2>
+<pre class="arvore"><code>src/
+├── main.tsx, App.tsx          Entrada e escolha da tela pela rota
+├── parse.ts                   Leitura de planilhas, cabeçalho, datas, NF, detecção Alloca07/Intelipost
+├── reconcile.ts               Regras do cruzamento Alloca07 × Intelipost
+├── styles.css                 Todo o visual (tema claro/escuro, padrão Arklok 2024)
+├── types/index.ts             Tipos compartilhados (Integration, filtros, avisos)
+├── context/AppContext.tsx     Estado global: notas, filtros, tema, menu, avisos, envio do cruzamento
+├── router/useRouter.ts        Roteador por hash e breadcrumbs
+├── services/
+│   ├── workbookImport.ts      Alloca07 + Intelipost → lista de Integration
+│   ├── integrationService.ts  Guarda e filtra as notas; corte do dia; métricas
+│   ├── entregasImport.ts      Transações, SPfly, Jamef, Certex e situação de entrega
+│   ├── conferenciaImport.ts   Planilha base da tela Entregas
+│   ├── zendeskImport.ts       Tickets e NF dos romaneios
+│   ├── expedicaoImport.ts     Relatório de Expedição (IndexedDB)
+│   ├── sla.ts                 SLA, regiões e dias úteis
+│   ├── bancoDiario.ts         Banco acumulado, resumo diário e verificação (IndexedDB)
+│   ├── diaAtivo.ts            Modo "dia antigo" somente leitura
+│   ├── importacoes.ts         Prévia e histórico de importações
+│   ├── tratativaService.ts    Tratativas por nota
+│   ├── exportGeral.ts         Montagem das 6 tabelas e gravação do Excel
+│   ├── pastaExport.ts         Gravação na pasta escolhida (File System Access API)
+│   ├── baixaMassa.ts          Planilha de baixa em massa do Zendesk
+│   └── mockData.ts            Dados de exemplo do modelo inicial
+├── hooks/
+│   ├── useEntregasNotas.ts    Notas integradas × situação de entrega
+│   ├── useEntregaPorTicket.ts Situação das NFs de cada ticket; "pronto para baixa"
+│   ├── useTicketsPorNf.ts     NF → tickets abertos
+│   └── useConferencia.ts      Planilha base × entregas, linha a linha
+├── pages/                     Uma página por tela
+├── components/
+│   ├── layout/                Menu lateral, topo, busca global, seletor de dia
+│   ├── common/                Upload, filtros, modais (banco, tratativa, importação)
+│   └── charts/BiCharts.tsx    Gráficos SVG do Painel
+└── utils/                     Data de hoje (fuso SP), período, CSV, anomalia, memoização</code></pre>
+
+      <h3>Como fazer mudanças comuns</h3>
+      <h4>A transportadora mudou o nome de uma coluna</h4>
+      <p>Em <code>entregasImport.ts → importTransportadoraFile</code>, inclua o nome novo (normalizado: minúsculas, sem acento) na lista da coluna correspondente, por exemplo <code>previsao: col('prev entrega', 'previsao entrega', …)</code>.</p>
+
+      <h4>Nova transportadora com planilha própria</h4>
+      <ol>
+        <li>Inclua o id e o nome em <code>TRANSPORTADORAS</code> e no tipo <code>TransportadoraId</code> (<code>entregasImport.ts</code>).</li>
+        <li>Inclua uma regra em <code>grupoTransportadora</code> para reconhecer o nome que vem da Intelipost.</li>
+        <li>Inclua a chave em <code>CHAVE_LOCAL_CONHECIDA</code> (<code>bancoDiario.ts</code>), para a verificação não tratá-la como lixo.</li>
+        <li>Inclua o texto de ajuda em <code>MODELO_TRANSPORTADORA</code> (<code>EntregasPage.tsx</code>).</li>
+      </ol>
+      <p>O cartão de upload, o Painel, o Início e as exportações usam a lista <code>TRANSPORTADORAS</code> e passam a mostrar a nova transportadora sozinhos.</p>
+
+      <h4>Mudar a meta de SLA</h4>
+      <p>A constante <code>META</code> (Painel) e <code>META_SLA</code> (Entregas) valem 95. O limite do amarelo (85) está nas funções <code>corPct</code> e <code>corPctSla</code>.</p>
+
+      <h4>Considerar feriados</h4>
+      <p>Altere só a função <code>diasUteis</code> em <code>sla.ts</code>. Todos os cálculos de atraso e lead time passam por ela.</p>
+
+      <h4>Mudar a estrutura de uma chave do localStorage</h4>
+      <p>Troque o sufixo de versão (ex.: <code>_v1</code> para <code>_v2</code>), para que dados antigos em formato diferente não sejam lidos errado. Inclua a chave nova em <code>CHAVE_LOCAL_CONHECIDA</code>.</p>
+
+      <h3>Testes</h3>
+      <p>Não há testes automatizados. As regras foram validadas com as planilhas reais: os importadores são empacotados com esbuild e executados no Node com um arquivo de exemplo. A checagem de tipos roda com <code>npx tsc -p tsconfig.app.json --noEmit</code>.</p>
+    </section>
+
+    <!-- 17 =============================================================== -->
+    <section id="glossario">
+      <h2>17. Glossário</h2>
+      <table>
+        <tbody>
+          <tr><td><b>Alloca07 / Alloca08</b></td><td>Rotinas do Protheus que listam as notas fiscais emitidas (Alloca07) e os itens/tickets (Alloca08)</td></tr>
+          <tr><td><b>Intelipost</b></td><td>Plataforma de gestão de fretes que recebe as notas e acompanha as transportadoras</td></tr>
+          <tr><td><b>Integrada</b></td><td>Nota da Alloca07 que chegou na Intelipost (pelo número ou pela NF triangular)</td></tr>
+          <tr><td><b>NF triangular</b></td><td>Segunda nota da mesma carga, em operações com três partes. Vale como integração e entrega da principal.</td></tr>
+          <tr><td><b>Remanejamento fiscal</b></td><td>Tipo de nota sem transporte ao cliente. Fica fora do cruzamento.</td></tr>
+          <tr><td><b>Romaneio</b></td><td>Documento de carga que agrupa as NFs de um chamado</td></tr>
+          <tr><td><b>Tp. Previsão (tipo)</b></td><td>Classificação da nota na Alloca: Sustentação, Implantação, Substituição, Projetos…</td></tr>
+          <tr><td><b>Previsão</b></td><td>Data prometida pela transportadora para a entrega. É a base do SLA.</td></tr>
+          <tr><td><b>Vencida</b></td><td>Ainda não entregue, com a previsão já passada</td></tr>
+          <tr><td><b>Lead time</b></td><td>Dias úteis entre a saída da Arklok e a entrega</td></tr>
+          <tr><td><b>d.u.</b></td><td>Dias úteis (segunda a sexta, sem feriados)</td></tr>
+          <tr><td><b>Frota interna / Lalamove</b></td><td>Entregas feitas pela frota própria ou pelo app Lalamove, sem planilha de transportadora</td></tr>
+          <tr><td><b>Reversa / retorno ao CD</b></td><td>Coleta que volta para a Arklok (CD de Itapevi). Não é entrega ao cliente.</td></tr>
+          <tr><td><b>Baixa em massa</b></td><td>Fechamento de vários tickets do Zendesk a partir de uma planilha de IDs</td></tr>
+          <tr><td><b>Tratativa</b></td><td>Registro do que foi feito com uma nota pendente: comentário, PDV, nota antiga/nova</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 18 =============================================================== -->
+    <section id="limitacoes">
+      <h2>18. Limitações e pontos de atenção</h2>
+      <ol>
+        <li><b>Dados por máquina e por navegador.</b> Não há compartilhamento entre usuários: outro computador, outro perfil ou outro endereço começa vazio. Para backup, use Banco de dados → banco completo.</li>
+        <li><b>Limite do localStorage (~5 MB).</b> Planilhas muito grandes podem não caber. O app avisa e oferece "Verificar banco" e "Guardar e limpar".</li>
+        <li><b>Feriados não entram</b> no cálculo de dias úteis, só sábado e domingo.</li>
+        <li><b>O SLA usa a previsão da transportadora</b>, não uma tabela de prazos contratados da Arklok. Se a transportadora alterar a previsão, o SLA muda junto.</li>
+        <li><b>NF repetida entre emitentes.</b> O número da NF pode se repetir entre empresas diferentes. Só a ligação com a expedição confere a UF; nas demais telas vale o número.</li>
+        <li><b>Duplicadas na origem.</b> Na Intelipost (relatório de envios) vale a primeira linha da NF; na Expedição, a última.</li>
+        <li><b>Entrada manual.</b> Depende de exportar as planilhas certas. Mudanças de layout nos portais (nomes de coluna) exigem ajuste no importador; a mensagem de erro informa quais colunas faltaram.</li>
+        <li><b>Restos do modelo inicial.</b> O detalhe da nota mostra "Histórico de execuções", "Console de logs", "Trilha de auditoria" e "Parâmetros do endpoint" com dados de exemplo. O botão "Reprocessar" só simula. Nada disso interfere no cruzamento.</li>
+        <li><b>Atualização automática.</b> Por padrão, a cada 30 segundos o app recalcula os números com os dados locais, sem acessar a rede. O intervalo pode ser alterado em Configurações.</li>
+        <li><b>Compasse</b> ainda está em construção.</li>
+        <li>Há <b>3 erros de tipagem</b> conhecidos em <code>src/services/importacoes.ts</code> (linhas 182, 305 e 306), por campos que não existem nos tipos (<code>semNf</code>, <code>linhas</code>, <code>atual()</code>). Não afetam o uso em desenvolvimento, mas fazem o <code>npm run build</code> falhar até serem corrigidos.</li>
+      </ol>
+    </section>
+
+    <!-- 19 =============================================================== -->
+    <section id="migracao">
+      <h2>19. Migração para banco de dados no servidor <span class="selo warn" style="vertical-align:middle">Proposta · a validar com a TI</span></h2>
+      <div class="nota">As seções 1 a 18 descrevem a versão atual, que roda só no navegador. Esta seção é o plano para levar os dados para um banco no servidor da Arklok. Os pontos que dependem da TI estão em <a href="#mig-decisoes">19.10 Decisões em aberto</a>, cada um com uma recomendação.</div>
+
+      <h3>19.1 Por que migrar</h3>
+      <table>
+        <thead><tr><th>Hoje (navegador)</th><th>Depois (servidor)</th></tr></thead>
+        <tbody>
+          <tr><td>Cada máquina tem sua própria base; outro usuário começa vazio</td><td>Uma base única: todos veem os mesmos números</td></tr>
+          <tr><td>Limite de ~5 MB no localStorage; planilhas grandes às vezes não cabem</td><td>Sem limite prático</td></tr>
+          <tr><td>Sem login: quem usa a máquina vê tudo</td><td>Login com a conta da empresa e perfis de acesso</td></tr>
+          <tr><td>Backup manual (exportar o banco)</td><td>Backup do servidor, feito pela TI</td></tr>
+          <tr><td>Tratativas e comentários ficam numa máquina só</td><td>Tratativas compartilhadas, com o nome de quem fez</td></tr>
+          <tr><td>Histórico depende do navegador não ser limpo</td><td>Histórico completo de cada registro no banco</td></tr>
+          <tr><td>Dados só dentro do app</td><td>Views no banco que o Power BI pode ler direto</td></tr>
+        </tbody>
+      </table>
+
+      <h3>19.2 O que não muda</h3>
+      <ul>
+        <li>As <b>telas</b>, os <b>filtros</b> e as <b>regras de negócio</b> (seções 8 a 11) continuam iguais para o usuário.</li>
+        <li>A entrada continua sendo por <b>planilha exportada</b>. Integração direta com Intelipost e Zendesk fica para uma fase futura (19.9).</li>
+        <li>Os <b>importadores</b> (<code>parse.ts</code>, <code>reconcile.ts</code>, <code>*Import.ts</code>) são reaproveitados. Eles já rodam no Node.js: foi assim que foram testados.</li>
+        <li>Nada sai da rede da Arklok: o navegador só conversa com o servidor interno.</li>
+      </ul>
+
+      <h3>19.3 Arquitetura proposta</h3>
+      <div class="fluxo">
+        <div class="coluna">
+          <h4>Usuário</h4>
+          <div class="caixa tela">Navegador (Chrome/Edge)<small>mesmas telas React de hoje</small></div>
+          <div class="caixa tela">Power BI<small>lê as views do banco (opcional)</small></div>
+        </div>
+        <div class="seta">→</div>
+        <div class="coluna">
+          <h4>Servidor de aplicação</h4>
+          <div class="caixa proc">ArkTransp API<small>Node.js 20 + TypeScript · HTTPS · rota /api</small></div>
+          <div class="caixa proc">Arquivos estáticos<small>pasta dist/ do front, no mesmo endereço</small></div>
+          <div class="caixa proc">Pasta de arquivos originais<small>cópia de cada planilha enviada</small></div>
+        </div>
+        <div class="seta">→</div>
+        <div class="coluna">
+          <h4>Banco de dados</h4>
+          <div class="caixa dados">SQL Server<small>schema arktransp · tabelas temporais para histórico</small></div>
+          <div class="caixa dados">Backup da TI<small>completo diário + log</small></div>
+        </div>
+      </div>
+      <ul>
+        <li><b>Mesmo endereço</b> para o site e a API (ex.: <code>https://arktransp.arklok.local</code> e <code>…/api</code>). Assim a política de segurança continua <code>connect-src 'self'</code>, sem abrir exceções.</li>
+        <li><b>Node.js na API:</b> mesma linguagem do front, então os tipos e os importadores são compartilhados sem reescrever. Se o padrão da TI for .NET, ver 19.10.</li>
+        <li><b>SQL Server:</b> sugerido por ser o padrão mais comum em ambiente Windows e no Protheus. O modelo abaixo funciona em PostgreSQL com pequenas trocas de tipo.</li>
+      </ul>
+
+      <h3>19.4 Como a importação passa a funcionar</h3>
+      <p>Mantém as etapas de hoje (prévia → confirmação), agora no servidor:</p>
+      <ol class="passos">
+        <li>O usuário escolhe a planilha. O navegador envia o <b>arquivo original</b> para <code>POST /api/importacoes?fonte=spfly</code>.</li>
+        <li>A API guarda uma cópia do arquivo, calcula o hash SHA-256 (detecta o mesmo arquivo enviado duas vezes), roda o importador e grava a importação com status <code>previa</code>.</li>
+        <li>A resposta traz os números, as 5 primeiras linhas e os avisos, iguais aos de hoje. A tela mostra a prévia.</li>
+        <li>Ao confirmar (<code>POST /api/importacoes/{id}/confirmar</code>), a API grava tudo <b>numa transação só</b>: ou entra tudo, ou nada muda.</li>
+        <li>As telas abertas dos outros usuários pegam os dados novos na próxima atualização automática.</li>
+      </ol>
+      <h4>Regra de gravação por fonte</h4>
+      <table>
+        <thead><tr><th>Fonte</th><th>Regra ao confirmar</th></tr></thead>
+        <tbody>
+          <tr><td>Alloca07, Intelipost (envios), Expedição</td><td><b>Upsert</b> por NF: insere a nova, atualiza a que mudou e mantém as que não vieram no arquivo</td></tr>
+          <tr><td>Transações Intelipost, SPfly, Jamef, Certex</td><td>Para cada NF do arquivo, <b>substitui os eventos daquela NF naquela fonte</b>. NFs fora do arquivo ficam como estavam (igual ao banco acumulado de hoje).</td></tr>
+          <tr><td>Tickets Zendesk</td><td>Upsert por ticket. Tickets que <b>não vieram</b> no arquivo novo saíram dos status de baixa e são marcados <code>ativo = 0</code> (com a data), sem serem apagados.</td></tr>
+          <tr><td>NF dos romaneios</td><td>Para cada ticket do arquivo, substitui as linhas de romaneio dele</td></tr>
+          <tr><td>Planilha base</td><td>Cada envio vira uma <b>lista</b> com nome, autor e data. Dá para ter várias listas e escolher qual conferir.</td></tr>
+        </tbody>
+      </table>
+      <p>Duas confirmações da mesma fonte ao mesmo tempo são feitas em fila (trava por fonte), para uma não sobrescrever a outra pela metade.</p>
+
+      <h3>19.5 Modelo de dados</h3>
+      <p>Schema <code>arktransp</code>. As tabelas de origem guardam o que veio das planilhas. O cruzamento Alloca07 × Intelipost vira uma <b>view</b>, recalculada a cada consulta, então nunca fica desatualizado.</p>
+      <table>
+        <thead><tr><th>Tabela</th><th>Chave</th><th>Conteúdo</th><th>Substitui hoje</th></tr></thead>
+        <tbody>
+          <tr><td><code>usuario</code></td><td>id</td><td>Login da rede, nome, perfil</td><td>—</td></tr>
+          <tr><td><code>importacao</code></td><td>id</td><td>Cada envio: fonte, arquivo, hash, autor, status, números, período, erro</td><td><code>arklok_importacoes_v1</code></td></tr>
+          <tr><td><code>alloca_nota</code> ⏱</td><td>nf</td><td>Notas da Alloca07 (uma por NF, já agrupada)</td><td>parte de <code>arklok_integrations_v3</code></td></tr>
+          <tr><td><code>intelipost_envio</code> ⏱</td><td>nf</td><td>Envios da Intelipost (relatório de envios)</td><td>parte de <code>arklok_integrations_v3</code></td></tr>
+          <tr><td><code>evento_entrega</code></td><td>id</td><td>Eventos de entrega por fonte (transações, spfly, jamef, certex)</td><td><code>arklok_entregas_*_v1</code></td></tr>
+          <tr><td><code>ticket_zendesk</code> ⏱</td><td>id_zendesk</td><td>Tickets, com <code>ativo</code></td><td><code>arklok_zendesk_tickets_v1</code></td></tr>
+          <tr><td><code>romaneio_nf</code></td><td>id</td><td>Ticket × romaneio × NF × etapa</td><td><code>arklok_zendesk_nf_v1</code></td></tr>
+          <tr><td><code>expedicao</code></td><td>nf</td><td>Saída da Arklok por NF</td><td>IndexedDB <code>arklok_expedicao</code></td></tr>
+          <tr><td><code>tratativa</code> ⏱</td><td>nf</td><td>Tratado, PDV, nota antiga/nova, quem e quando</td><td><code>arklok_tratativas_v1</code></td></tr>
+          <tr><td><code>comentario</code></td><td>id</td><td>Comentários de tratativa com autor</td><td><code>arklok_tratativas_v1</code></td></tr>
+          <tr><td><code>lista_conferencia</code>, <code>lista_conferencia_linha</code>, <code>lista_conferencia_nf</code></td><td>id</td><td>Planilhas base e suas linhas/NFs</td><td><code>arklok_entregas_base_v1</code></td></tr>
+          <tr><td><code>feriado</code></td><td>data</td><td>Feriados nacionais e por UF (para dias úteis)</td><td>— (novo)</td></tr>
+          <tr><td><code>parametro</code></td><td>chave</td><td>Meta de SLA (95), limite do amarelo (85)</td><td>constantes no código</td></tr>
+          <tr><td><code>auditoria</code></td><td>id</td><td>Quem fez o quê: importou, confirmou, tratou, apagou</td><td>— (novo)</td></tr>
+        </tbody>
+      </table>
+      <p>⏱ = <b>tabela temporal</b> (system-versioned): o SQL Server guarda sozinho cada versão antiga da linha numa tabela <code>_historico</code>. Isso substitui o banco acumulado, as colunas <code>primeira_vez_vista</code>/<code>ultima_atualizacao</code> e as "fotos" de dias antigos. "Ver dados de 10/10" vira uma consulta <code>FOR SYSTEM_TIME AS OF '2026-10-10'</code>.</p>
+
+      <h4>Script de criação (SQL Server 2019 ou superior)</h4>
+<pre><code>CREATE SCHEMA arktransp;
+GO
+
+CREATE TABLE arktransp.usuario (
+  id         INT IDENTITY PRIMARY KEY,
+  login      NVARCHAR(100) NOT NULL UNIQUE,          -- conta da rede (ex.: ARKLOK\diogo.silva)
+  nome       NVARCHAR(150) NOT NULL,
+  perfil     VARCHAR(10)   NOT NULL DEFAULT 'operador'
+             CHECK (perfil IN ('leitura', 'operador', 'admin')),
+  ativo      BIT           NOT NULL DEFAULT 1,
+  criado_em  DATETIME2(0)  NOT NULL DEFAULT SYSDATETIME()
+);
+
+CREATE TABLE arktransp.importacao (
+  id                 BIGINT IDENTITY PRIMARY KEY,
+  fonte              VARCHAR(12)   NOT NULL
+                     CHECK (fonte IN ('alloca07', 'intelipost', 'transacoes', 'spfly', 'jamef', 'certex',
+                                      'zendesk', 'romaneios', 'expedicao', 'base', 'migracao')),
+  arquivo            NVARCHAR(260) NOT NULL,
+  caminho_original   NVARCHAR(400) NULL,                -- cópia do arquivo no servidor
+  hash_sha256        CHAR(64)      NOT NULL,
+  tamanho_bytes      BIGINT        NOT NULL,
+  status             VARCHAR(10)   NOT NULL CHECK (status IN ('previa', 'confirmada', 'descartada', 'erro')),
+  linhas_aceitas     INT NULL,
+  linhas_descartadas INT NULL,
+  periodo_de         DATE NULL,
+  periodo_ate        DATE NULL,
+  resumo_json        NVARCHAR(MAX) NULL,                -- números e avisos da prévia
+  erro               NVARCHAR(1000) NULL,
+  usuario_id         INT NOT NULL REFERENCES arktransp.usuario (id),
+  criado_em          DATETIME2(0)  NOT NULL DEFAULT SYSDATETIME(),
+  confirmado_em      DATETIME2(0)  NULL
+);
+CREATE INDEX ix_importacao_fonte ON arktransp.importacao (fonte, criado_em DESC);
+
+CREATE TABLE arktransp.alloca_nota (
+  nf             BIGINT        NOT NULL PRIMARY KEY,
+  nf_triangular  BIGINT        NULL,
+  tipo           NVARCHAR(60)  NULL,                    -- Tp. Previsão
+  data_emissao   DATE          NULL,
+  cliente        NVARCHAR(200) NULL,
+  cidade         NVARCHAR(100) NULL,
+  uf             CHAR(2)       NULL,
+  romaneio       VARCHAR(30)   NULL,
+  pedido         VARCHAR(30)   NULL,
+  contrato       VARCHAR(30)   NULL,
+  termo          VARCHAR(30)   NULL,
+  serie          VARCHAR(5)    NULL,
+  prev_entrada   DATE          NULL,
+  linhas         INT           NOT NULL DEFAULT 1,      -- linhas da planilha agrupadas nesta NF
+  importacao_id  BIGINT        NOT NULL REFERENCES arktransp.importacao (id),
+  valido_de      DATETIME2 GENERATED ALWAYS AS ROW START HIDDEN NOT NULL,
+  valido_ate     DATETIME2 GENERATED ALWAYS AS ROW END   HIDDEN NOT NULL,
+  PERIOD FOR SYSTEM_TIME (valido_de, valido_ate)
+) WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = arktransp.alloca_nota_historico));
+CREATE INDEX ix_alloca_triangular ON arktransp.alloca_nota (nf_triangular);
+CREATE INDEX ix_alloca_emissao    ON arktransp.alloca_nota (data_emissao);
+
+CREATE TABLE arktransp.intelipost_envio (
+  nf              BIGINT        NOT NULL PRIMARY KEY,
+  transportadora  NVARCHAR(100) NULL,
+  rastreio        NVARCHAR(100) NULL,
+  metodo_envio    NVARCHAR(100) NULL,
+  status          NVARCHAR(100) NULL,
+  destinatario    NVARCHAR(200) NULL,
+  cidade          NVARCHAR(100) NULL,
+  uf              CHAR(2)       NULL,
+  pedido          VARCHAR(40)   NULL,
+  data_criacao    DATETIME2(0)  NULL,                   -- vira a data de integração
+  data_despacho   DATETIME2(0)  NULL,
+  data_entrega    DATETIME2(0)  NULL,
+  previsao        DATE          NULL,
+  importacao_id   BIGINT        NOT NULL REFERENCES arktransp.importacao (id),
+  valido_de       DATETIME2 GENERATED ALWAYS AS ROW START HIDDEN NOT NULL,
+  valido_ate      DATETIME2 GENERATED ALWAYS AS ROW END   HIDDEN NOT NULL,
+  PERIOD FOR SYSTEM_TIME (valido_de, valido_ate)
+) WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = arktransp.intelipost_envio_historico));
+
+CREATE TABLE arktransp.evento_entrega (
+  id              BIGINT IDENTITY PRIMARY KEY,
+  fonte           VARCHAR(12)   NOT NULL CHECK (fonte IN ('transacoes', 'spfly', 'jamef', 'certex')),
+  nf              BIGINT        NOT NULL,
+  transportadora  NVARCHAR(100) NULL,
+  ultimo_status   NVARCHAR(200) NULL,
+  data_status     DATETIME2(0)  NULL,
+  previsao        DATE          NULL,
+  data_entrega    DATETIME2(0)  NULL,
+  recebedor       NVARCHAR(150) NULL,
+  destinatario    NVARCHAR(200) NULL,
+  cidade          NVARCHAR(100) NULL,
+  uf              CHAR(2)       NULL,
+  base_saida      NVARCHAR(60)  NULL,                   -- "Hub (Agência)" das transações
+  importacao_id   BIGINT        NOT NULL REFERENCES arktransp.importacao (id)
+);
+CREATE INDEX ix_evento_nf ON arktransp.evento_entrega (nf, fonte);
+CREATE INDEX ix_evento_previsao ON arktransp.evento_entrega (previsao) INCLUDE (data_entrega, uf);
+
+CREATE TABLE arktransp.ticket_zendesk (
+  id_zendesk             BIGINT        NOT NULL PRIMARY KEY,
+  status                 NVARCHAR(60)  NOT NULL,
+  aba                    VARCHAR(25)   NOT NULL,        -- em_rota | aguardando_expedicao
+  ativo                  BIT           NOT NULL DEFAULT 1,
+  fora_desde             DATETIME2(0)  NULL,            -- quando saiu dos status de baixa
+  grupo                  NVARCHAR(100) NULL,
+  organizacao            NVARCHAR(200) NULL,
+  grupo_economico        NVARCHAR(200) NULL,
+  uf                     CHAR(2)       NULL,
+  localidade             NVARCHAR(100) NULL,
+  prioridade             NVARCHAR(40)  NULL,
+  criado_em              DATETIME2(0)  NULL,
+  atualizado_em          DATETIME2(0)  NULL,
+  idade_dias             DECIMAL(9, 2) NULL,
+  dias_sem_atualizacao   DECIMAL(9, 2) NULL,
+  importacao_id          BIGINT        NOT NULL REFERENCES arktransp.importacao (id),
+  valido_de              DATETIME2 GENERATED ALWAYS AS ROW START HIDDEN NOT NULL,
+  valido_ate             DATETIME2 GENERATED ALWAYS AS ROW END   HIDDEN NOT NULL,
+  PERIOD FOR SYSTEM_TIME (valido_de, valido_ate)
+) WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = arktransp.ticket_zendesk_historico));
+
+CREATE TABLE arktransp.romaneio_nf (
+  id             BIGINT IDENTITY PRIMARY KEY,
+  id_zendesk     BIGINT       NOT NULL,
+  romaneio       VARCHAR(30)  NULL,
+  data_romaneio  DATE         NULL,
+  nf             BIGINT       NULL,                     -- NULL = romaneio ainda sem NF
+  etapa          NVARCHAR(100) NULL,
+  importacao_id  BIGINT       NOT NULL REFERENCES arktransp.importacao (id)
+);
+CREATE INDEX ix_romaneio_ticket ON arktransp.romaneio_nf (id_zendesk);
+CREATE INDEX ix_romaneio_nf     ON arktransp.romaneio_nf (nf);
+
+CREATE TABLE arktransp.expedicao (
+  nf              BIGINT        NOT NULL PRIMARY KEY,
+  data_saida      DATE          NULL,
+  uf              CHAR(2)       NULL,
+  transportadora  NVARCHAR(100) NULL,
+  modal           NVARCHAR(60)  NULL,
+  tipo            NVARCHAR(60)  NULL,
+  cliente         NVARCHAR(200) NULL,
+  importacao_id   BIGINT        NOT NULL REFERENCES arktransp.importacao (id)
+);
+
+CREATE TABLE arktransp.tratativa (
+  nf               BIGINT        NOT NULL PRIMARY KEY,
+  tratado          BIT           NOT NULL DEFAULT 0,
+  tratado_em       DATETIME2(0)  NULL,
+  pdv              NVARCHAR(60)  NULL,
+  nota_antiga      BIGINT        NULL,
+  nota_nova        BIGINT        NULL,
+  atualizado_por   INT           NOT NULL REFERENCES arktransp.usuario (id),
+  valido_de        DATETIME2 GENERATED ALWAYS AS ROW START HIDDEN NOT NULL,
+  valido_ate       DATETIME2 GENERATED ALWAYS AS ROW END   HIDDEN NOT NULL,
+  PERIOD FOR SYSTEM_TIME (valido_de, valido_ate)
+) WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = arktransp.tratativa_historico));
+
+CREATE TABLE arktransp.comentario (
+  id           BIGINT IDENTITY PRIMARY KEY,
+  nf           BIGINT         NOT NULL,
+  texto        NVARCHAR(2000) NOT NULL,
+  usuario_id   INT            NOT NULL REFERENCES arktransp.usuario (id),
+  criado_em    DATETIME2(0)   NOT NULL DEFAULT SYSDATETIME(),
+  removido_em  DATETIME2(0)   NULL                      -- remoção lógica
+);
+CREATE INDEX ix_comentario_nf ON arktransp.comentario (nf);
+
+CREATE TABLE arktransp.lista_conferencia (
+  id             BIGINT IDENTITY PRIMARY KEY,
+  nome           NVARCHAR(150) NOT NULL,
+  tem_ticket     BIT NOT NULL,
+  tem_tipo       BIT NOT NULL,
+  tem_emissao    BIT NOT NULL,
+  importacao_id  BIGINT NOT NULL REFERENCES arktransp.importacao (id),
+  arquivada      BIT NOT NULL DEFAULT 0
+);
+CREATE TABLE arktransp.lista_conferencia_linha (
+  lista_id      BIGINT        NOT NULL REFERENCES arktransp.lista_conferencia (id) ON DELETE CASCADE,
+  ordem         INT           NOT NULL,
+  id_zendesk    BIGINT        NULL,
+  organizacao   NVARCHAR(200) NULL,
+  tipo          NVARCHAR(60)  NULL,
+  data_emissao  DATE          NULL,
+  cidade        NVARCHAR(100) NULL,
+  uf            CHAR(2)       NULL,
+  PRIMARY KEY (lista_id, ordem)
+);
+CREATE TABLE arktransp.lista_conferencia_nf (
+  lista_id  BIGINT NOT NULL,
+  ordem     INT    NOT NULL,
+  nf        BIGINT NOT NULL,
+  PRIMARY KEY (lista_id, ordem, nf),
+  FOREIGN KEY (lista_id, ordem) REFERENCES arktransp.lista_conferencia_linha (lista_id, ordem) ON DELETE CASCADE
+);
+
+CREATE TABLE arktransp.feriado (
+  data       DATE         NOT NULL,
+  uf         CHAR(2)      NOT NULL DEFAULT '',          -- '' = nacional
+  descricao  NVARCHAR(100) NOT NULL,
+  PRIMARY KEY (data, uf)
+);
+
+CREATE TABLE arktransp.parametro (
+  chave  VARCHAR(40)   NOT NULL PRIMARY KEY,
+  valor  NVARCHAR(200) NOT NULL
+);
+INSERT INTO arktransp.parametro (chave, valor) VALUES ('meta_sla', '95'), ('limite_amarelo_sla', '85');
+
+CREATE TABLE arktransp.auditoria (
+  id          BIGINT IDENTITY PRIMARY KEY,
+  usuario_id  INT           NOT NULL REFERENCES arktransp.usuario (id),
+  acao        VARCHAR(30)   NOT NULL,                   -- importar, confirmar, tratar, comentar, apagar...
+  entidade    VARCHAR(30)   NOT NULL,
+  chave       NVARCHAR(60)  NULL,
+  detalhe     NVARCHAR(MAX) NULL,                       -- JSON
+  em          DATETIME2(0)  NOT NULL DEFAULT SYSDATETIME()
+);
+GO</code></pre>
+
+      <h4>View do cruzamento (mesma regra da seção 8)</h4>
+<pre><code>CREATE VIEW arktransp.vw_cruzamento AS
+WITH hoje AS (
+  SELECT CAST(SYSDATETIMEOFFSET() AT TIME ZONE 'E. South America Standard Time' AS DATE) AS dia
+)
+SELECT a.nf, a.nf_triangular, a.tipo, a.data_emissao, a.cliente, a.cidade, a.uf, a.romaneio, a.pedido, a.contrato,
+       CASE WHEN COALESCE(d.nf, t.nf) IS NULL THEN 'nao_integrada' ELSE 'integrada' END AS status,
+       CASE WHEN d.nf IS NOT NULL THEN 'direta' WHEN t.nf IS NOT NULL THEN 'triangular' END AS validacao,
+       COALESCE(d.data_criacao, t.data_criacao)     AS data_integracao,
+       COALESCE(d.transportadora, t.transportadora) AS transportadora,
+       COALESCE(d.rastreio, t.rastreio)             AS rastreio
+FROM arktransp.alloca_nota a
+CROSS JOIN hoje
+LEFT JOIN arktransp.intelipost_envio d ON d.nf = a.nf
+LEFT JOIN arktransp.intelipost_envio t ON d.nf IS NULL AND t.nf = a.nf_triangular
+WHERE COALESCE(LTRIM(RTRIM(a.tipo)), '') COLLATE Latin1_General_CI_AI &lt;&gt; 'REMANEJAMENTO FISCAL'
+  AND (a.data_emissao IS NULL OR a.data_emissao &lt; hoje.dia)
+UNION ALL
+SELECT i.nf, NULL, NULL, NULL, i.destinatario, i.cidade, i.uf, NULL, i.pedido, NULL,
+       'so_intelipost', NULL, i.data_criacao, i.transportadora, i.rastreio
+FROM arktransp.intelipost_envio i
+CROSS JOIN hoje
+WHERE NOT EXISTS (SELECT 1 FROM arktransp.alloca_nota a WHERE a.nf = i.nf OR a.nf_triangular = i.nf)
+  AND (i.data_criacao IS NULL OR CAST(i.data_criacao AS DATE) &lt; hoje.dia);</code></pre>
+      <p>A situação de entrega e o SLA (seções 9 e 10) continuam calculados no navegador na fase 1, com o mesmo código de hoje. Na fase 3 eles ganham views próprias (<code>vw_entrega_nf</code>, <code>vw_sla_nf</code>) para o Power BI.</p>
+
+      <h4>Volume estimado</h4>
+      <p>Alguns milhares de NFs por mês, cerca de 20 mil linhas de expedição e de 2 a 3 eventos de entrega por NF. Mesmo com o histórico das tabelas temporais, a estimativa é de <b>menos de 1 GB por ano</b>. Caberia até num SQL Server Express (limite de 10 GB), mas o ideal é usar a instância padrão da empresa, que já tem backup.</p>
+
+      <h3>19.6 API</h3>
+      <p>Todas as rotas exigem login. Formato JSON, datas em <code>aaaa-mm-dd</code> / ISO 8601.</p>
+      <table>
+        <thead><tr><th>Método e rota</th><th>Uso</th><th>Perfil</th></tr></thead>
+        <tbody>
+          <tr><td><code>GET /api/me</code></td><td>Usuário logado e perfil</td><td>todos</td></tr>
+          <tr><td><code>POST /api/importacoes?fonte=…</code></td><td>Envia o arquivo e devolve a prévia</td><td>operador</td></tr>
+          <tr><td><code>POST /api/importacoes/{id}/confirmar</code></td><td>Grava os dados da prévia</td><td>operador</td></tr>
+          <tr><td><code>DELETE /api/importacoes/{id}</code></td><td>Descarta uma prévia</td><td>operador</td></tr>
+          <tr><td><code>GET /api/importacoes</code></td><td>Histórico de importações (filtro por fonte e data)</td><td>todos</td></tr>
+          <tr><td><code>GET /api/notas?emissaoDe&amp;emissaoAte&amp;status</code></td><td>Linhas da <code>vw_cruzamento</code></td><td>todos</td></tr>
+          <tr><td><code>GET /api/entregas/eventos?nfs=…</code> ou <code>?emissaoDe&amp;emissaoAte</code></td><td>Eventos de entrega</td><td>todos</td></tr>
+          <tr><td><code>GET /api/zendesk/tickets?ativo=1</code></td><td>Tickets</td><td>todos</td></tr>
+          <tr><td><code>GET /api/zendesk/romaneios</code></td><td>Romaneio × NF dos tickets ativos</td><td>todos</td></tr>
+          <tr><td><code>GET /api/expedicao?nfs=…</code></td><td>Saída por NF</td><td>todos</td></tr>
+          <tr><td><code>GET /api/tratativas</code>, <code>PUT /api/tratativas/{nf}</code></td><td>Ler e salvar tratativa</td><td>leitura / operador</td></tr>
+          <tr><td><code>POST /api/tratativas/{nf}/comentarios</code>, <code>DELETE …/comentarios/{id}</code></td><td>Comentários</td><td>operador</td></tr>
+          <tr><td><code>GET /api/listas</code>, <code>GET /api/listas/{id}</code></td><td>Planilhas base</td><td>todos</td></tr>
+          <tr><td><code>GET /api/feriados</code>, <code>GET /api/parametros</code></td><td>Feriados e metas</td><td>todos</td></tr>
+          <tr><td><code>GET /api/export/banco?mes=AAAA-MM</code></td><td>Excel do banco (mesmas abas de hoje)</td><td>todos</td></tr>
+        </tbody>
+      </table>
+      <p>Todas as leituras aceitam <code>asOf=AAAA-MM-DD</code>, que consulta as tabelas temporais. É o substituto do "Ver dados de um dia antigo".</p>
+
+      <h3>19.7 Mudanças no front</h3>
+      <p>O desenho atual ajuda: cada fonte já tem um store isolado (seção 3). A troca acontece só dentro dos stores; as telas não mudam.</p>
+      <table>
+        <thead><tr><th>Arquivo</th><th>Hoje</th><th>Depois</th></tr></thead>
+        <tbody>
+          <tr><td><code>src/api/cliente.ts</code> (novo)</td><td>—</td><td><code>fetch('/api/…', { credentials: 'include' })</code> com tratamento de erro e de sessão expirada</td></tr>
+          <tr><td><code>integrationService.ts</code></td><td>Lê e grava <code>arklok_integrations_v3</code></td><td>Lê <code>GET /api/notas</code></td></tr>
+          <tr><td><code>entregasImport.ts</code>, <code>zendeskImport.ts</code>, <code>expedicaoImport.ts</code>, <code>conferenciaImport.ts</code></td><td>Importam no navegador e gravam no localStorage/IndexedDB</td><td>Leem da API. Os importadores vão para uma pasta compartilhada (<code>shared/</code>), usada pela API.</td></tr>
+          <tr><td><code>importacoes.ts</code></td><td>Prévia local</td><td>Prévia vinda da API (mesma tela)</td></tr>
+          <tr><td><code>tratativaService.ts</code></td><td>localStorage</td><td><code>/api/tratativas</code>; comentários com o nome do autor</td></tr>
+          <tr><td><code>bancoDiario.ts</code>, <code>diaAtivo.ts</code></td><td>Banco acumulado no IndexedDB</td><td>Removidos. O histórico vem das tabelas temporais (<code>asOf</code>). "Verificar banco" deixa de ser necessário, porque o banco garante as regras com chaves e restrições.</td></tr>
+          <tr><td><code>sla.ts</code></td><td>Dias úteis sem feriado</td><td>Usa <code>GET /api/feriados</code></td></tr>
+          <tr><td><code>pastaExport.ts</code></td><td>Grava numa pasta local</td><td>Mantido (as exportações continuam sendo arquivos do usuário)</td></tr>
+        </tbody>
+      </table>
+      <p>No navegador ficam só as preferências: tema, menu e período do topo.</p>
+
+      <h3>19.8 Segurança no servidor</h3>
+      <ul>
+        <li><b>Login com a conta da rede</b> (Active Directory). As duas opções estão em 19.10. Sem senha própria do sistema.</li>
+        <li><b>Perfis:</b> <code>leitura</code> (vê e exporta), <code>operador</code> (importa e trata notas), <code>admin</code> (usuários, parâmetros, feriados).</li>
+        <li><b>HTTPS</b> com certificado interno. O servidor fica acessível só pela rede ou VPN da Arklok.</li>
+        <li><b>Conta de serviço</b> da API no SQL Server com permissão só no schema <code>arktransp</code> (sem <code>db_owner</code>).</li>
+        <li><b>Auditoria</b> de importações, tratativas e remoções na tabela <code>auditoria</code>.</li>
+        <li><b>LGPD:</b> o banco guarda nomes de clientes e de recebedores. Definir com a TI e o jurídico o prazo de retenção do histórico e dos arquivos originais (sugestão: 24 meses).</li>
+        <li><b>Limite de upload</b> (ex.: 50 MB) e aceite apenas de .xlsx, .xls e .csv.</li>
+      </ul>
+
+      <h3>19.9 Fases</h3>
+      <table>
+        <thead><tr><th>Fase</th><th>Entrega</th><th>Pronto quando</th></tr></thead>
+        <tbody>
+          <tr><td><b>0 · Definições</b></td><td>Respostas de 19.10, servidor, banco e endereço criados pela TI</td><td>A TI liberou o servidor, a instância e o nome DNS</td></tr>
+          <tr><td><b>1 · Base no servidor</b></td><td>Script do banco, API com importação e leitura, front lendo da API, login</td><td>Dois usuários em máquinas diferentes veem os mesmos números depois de uma importação</td></tr>
+          <tr><td><b>2 · Migração dos dados atuais</b></td><td>Carga do histórico e das tratativas existentes (abaixo)</td><td>Totais por mês iguais aos do Banco de dados local</td></tr>
+          <tr><td><b>3 · Melhorias</b></td><td>Feriados, views de entrega e SLA para o Power BI, tela de usuários e parâmetros</td><td>Painel do Power BI lendo <code>vw_sla_nf</code></td></tr>
+          <tr><td><b>4 · Automação (opcional)</b></td><td>Rotina agendada no servidor buscando dados via API da Intelipost e do Zendesk</td><td>Importações diárias sem envio manual</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Migração dos dados que estão hoje no navegador</h4>
+      <ol class="passos">
+        <li>Na máquina que tem o histórico, exportar <b>Banco de dados → banco completo</b> (<code>arktransp_banco_completo_….xlsx</code>). O arquivo já tem todas as tabelas, com <code>primeira_vez_vista</code> e <code>ultima_atualizacao</code>.</li>
+        <li>Rodar um script de carga (Node.js, na API) que lê esse Excel e grava nas tabelas novas, registrando uma importação de origem <code>migracao</code>. As tratativas e os comentários vêm das abas <code>Notas</code> e <code>Tratativas</code>.</li>
+        <li>Conferir os totais por mês e por situação contra a janela Banco de dados do app atual.</li>
+        <li>Período de transição: a versão local continua funcionando, em modo leitura, até a validação.</li>
+      </ol>
+
+      <h3 id="mig-decisoes">19.10 Decisões em aberto com a TI</h3>
+      <table>
+        <thead><tr><th>#</th><th>Pergunta</th><th>Opções</th><th>Recomendação</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Qual banco de dados?</td><td>SQL Server · PostgreSQL · Oracle</td><td><b>SQL Server</b>, se já for o padrão da empresa (tabelas temporais nativas)</td></tr>
+          <tr><td>2</td><td>Onde roda a API?</td><td>Windows Server (IIS) · Linux · container</td><td>O que a TI já administra. No Windows: Node.js como serviço, com IIS na frente cuidando do HTTPS.</td></tr>
+          <tr><td>3</td><td>Linguagem da API</td><td>Node.js (TypeScript) · .NET</td><td><b>Node.js</b>, para reaproveitar os importadores sem reescrever. Com .NET, os importadores e o cruzamento precisam ser portados.</td></tr>
+          <tr><td>4</td><td>Login</td><td>Autenticação integrada do Windows (IIS) · Entra ID / Azure AD (SSO)</td><td>Autenticação integrada do Windows, se todos usam máquinas na rede; Entra ID, se houver acesso fora da rede</td></tr>
+          <tr><td>5</td><td>Endereço</td><td>ex.: <code>arktransp.arklok.local</code></td><td>Nome interno com certificado da empresa</td></tr>
+          <tr><td>6</td><td>Chave da NF</td><td>Só o número · número + série · número + CNPJ do emitente</td><td>Só o número (como hoje). Se houver mais de um emitente na Alloca07, incluir série ou CNPJ na chave <b>antes</b> de criar as tabelas.</td></tr>
+          <tr><td>7</td><td>Guardar os arquivos originais?</td><td>Sim (pasta no servidor) · Não</td><td>Sim, por 24 meses. Ajuda a auditar e a reprocessar.</td></tr>
+          <tr><td>8</td><td>Backup e retenção</td><td>Política da TI</td><td>Backup completo diário + log; histórico temporal por 24 meses</td></tr>
+          <tr><td>9</td><td>Ambiente de homologação</td><td>Sim · Não</td><td>Sim: um banco <code>arktransp_hml</code> para testar importações antes de produção</td></tr>
+        </tbody>
+      </table>
+
+      <h3>19.11 Riscos</h3>
+      <table>
+        <thead><tr><th>Risco</th><th>Como mitigar</th></tr></thead>
+        <tbody>
+          <tr><td>Planilha errada confirmada por engano afeta todos os usuários</td><td>Prévia com avisos (já existe), perfil operador, histórico temporal para voltar a versão e auditoria</td></tr>
+          <tr><td>Notas "só Intelipost" aparecendo de períodos que a Alloca07 enviada não cobre</td><td>A tela já filtra pelo período de emissão; a view pode limitar ao intervalo coberto pelas importações da Alloca07</td></tr>
+          <tr><td>Servidor fora do ar para a operação</td><td>Monitoramento pela TI. As exportações em Excel continuam disponíveis como plano B.</td></tr>
+          <tr><td>Diferença de números entre a versão local e a do servidor</td><td>Fase 2 com conferência de totais antes de desligar a versão local</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 20 =============================================================== -->
+    <section id="evolucoes">
+      <h2>20. Possíveis evoluções</h2>
+      <table>
+        <thead><tr><th>Evolução</th><th>Benefício</th><th>Esforço</th></tr></thead>
+        <tbody>
+          <tr><td>Corrigir os 3 erros de tipagem</td><td>Libera o <code>npm run build</code> e a publicação</td><td>Baixo</td></tr>
+          <tr><td>Calendário de feriados em <code>diasUteis</code></td><td>Atraso e lead time mais justos</td><td>Baixo</td></tr>
+          <tr><td>Tabela de prazos de SLA por região e transportadora</td><td>SLA contra o prazo contratado, não contra a previsão</td><td>Médio</td></tr>
+          <tr><td>Remover os restos do modelo inicial</td><td>Código e telas mais simples</td><td>Baixo</td></tr>
+          <tr><td>Testes automatizados dos importadores e do cruzamento</td><td>Segurança ao mudar regras</td><td>Médio</td></tr>
+          <tr><td>Banco de dados no servidor da empresa (<a href="#migracao">seção 19</a>)</td><td>Base única compartilhada pela equipe, com login e backup</td><td>Alto</td></tr>
+          <tr><td>Integração via API com Intelipost e Zendesk</td><td>Elimina a exportação manual de planilhas</td><td>Alto</td></tr>
+          <tr><td>Conteúdo da tela Compasse</td><td>—</td><td>A definir</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <footer>ArkTransp · documentação técnica · Arklok</footer>
+  </main>
+</div>
+
+</body>
+</html>

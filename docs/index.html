@@ -1,0 +1,700 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ArkTransp · Guia do sistema</title>
+<style>
+  :root {
+    --red: #da291c;
+    --red-deep: #b8221a;
+    --red-soft: #fdf0ef;
+    --ink: #15181b;
+    --ink-2: #4a5157;
+    --ink-3: #6b737a;
+    --line: #eceef0;
+    --bg: #f7f8f9;
+    --card: #ffffff;
+    --ok: #2a7221;
+    --ok-soft: #e9f4e7;
+    --warn: #8a6500;
+    --warn-soft: #fdf5dc;
+    --info: #1f5f8b;
+    --info-soft: #e6f0f8;
+    --neutro-soft: #f0f2f3;
+    --sombra: 0 1px 2px rgba(16, 24, 32, .04), 0 4px 16px rgba(16, 24, 32, .05);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--ink);
+    background: var(--bg);
+  }
+  a { color: var(--red-deep); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Barra superior */
+  .barra {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(255, 255, 255, .92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .barra-conteudo { max-width: 1120px; margin: 0 auto; padding: 0 28px; height: 60px; display: flex; align-items: center; gap: 28px; }
+  .marca { font-weight: 700; font-size: 18px; color: var(--ink); white-space: nowrap; }
+  .marca b { color: var(--red); }
+  .barra nav { display: flex; gap: 4px; overflow-x: auto; }
+  .barra nav a { color: var(--ink-2); font-size: 14px; padding: 6px 12px; border-radius: 999px; white-space: nowrap; }
+  .barra nav a:hover { background: var(--neutro-soft); color: var(--ink); text-decoration: none; }
+
+  /* Capa */
+  .capa { background: var(--red); color: #fff; }
+  .capa-conteudo { max-width: 1120px; margin: 0 auto; padding: 72px 28px 80px; }
+  .capa small { font-size: 13px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; opacity: .85; }
+  .capa h1 { font-size: 56px; line-height: 1.05; margin: 12px 0 16px; font-weight: 700; letter-spacing: -.02em; }
+  .capa p { font-size: 20px; max-width: 680px; margin: 0; opacity: .95; }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+  .chip { background: rgba(255, 255, 255, .16); border: 1px solid rgba(255, 255, 255, .28); border-radius: 999px; padding: 6px 14px; font-size: 14px; }
+
+  /* Seções */
+  main { max-width: 1120px; margin: 0 auto; padding: 0 28px 80px; }
+  section { padding-top: 72px; }
+  .rotulo { display: inline-block; color: var(--red); font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 6px; }
+  h2 { font-size: 32px; line-height: 1.2; margin: 0 0 12px; letter-spacing: -.01em; }
+  .intro { color: var(--ink-2); font-size: 18px; max-width: 760px; margin: 0 0 32px; }
+  h3 { font-size: 20px; margin: 0 0 6px; }
+  p { margin: 0 0 12px; }
+  ul { margin: 0; padding-left: 20px; }
+  li { margin-bottom: 6px; }
+
+  .grade { display: grid; gap: 20px; }
+  .g2 { grid-template-columns: repeat(2, 1fr); }
+  .g3 { grid-template-columns: repeat(3, 1fr); }
+  .g4 { grid-template-columns: repeat(4, 1fr); }
+  .cartao { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 24px; box-shadow: var(--sombra); }
+  .cartao p:last-child { margin-bottom: 0; }
+  .cartao .texto { color: var(--ink-2); font-size: 15px; }
+
+  .icone {
+    width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    background: var(--red-soft); color: var(--red); margin-bottom: 16px;
+  }
+  .icone svg { width: 22px; height: 22px; }
+
+  /* Problema → solução */
+  .problema b { display: block; font-size: 16px; margin-bottom: 4px; }
+  .problema .antes { color: var(--ink-3); font-size: 14px; margin-bottom: 10px; }
+  .problema .depois { font-size: 15px; color: var(--ink); border-top: 1px dashed var(--line); padding-top: 10px; }
+  .problema .depois::before { content: "Agora: "; color: var(--ok); font-weight: 600; }
+
+  /* Passos */
+  .passo { position: relative; }
+  .passo .numero { font-size: 40px; font-weight: 700; color: var(--red); line-height: 1; margin-bottom: 12px; }
+
+  /* Linha do tempo */
+  .tempo { list-style: none; padding: 0; margin: 0; position: relative; }
+  .tempo::before { content: ""; position: absolute; left: 15px; top: 8px; bottom: 8px; width: 2px; background: var(--line); }
+  .tempo li { position: relative; padding: 0 0 22px 52px; margin: 0; }
+  .tempo li::before {
+    content: ""; position: absolute; left: 8px; top: 6px; width: 16px; height: 16px; border-radius: 50%;
+    background: #fff; border: 3px solid var(--red);
+  }
+  .tempo li.opcional::before { border-color: var(--ink-3); }
+  .tempo b { display: block; }
+  .tempo span { color: var(--ink-2); font-size: 15px; }
+
+  /* Funcionalidades */
+  .atalhos a { display: flex; align-items: center; gap: 12px; color: var(--ink); font-weight: 600; }
+  .atalhos a:hover { text-decoration: none; border-color: var(--red); }
+  .atalhos .icone { margin: 0; width: 38px; height: 38px; flex: none; }
+  .atalhos small { display: block; font-weight: 400; color: var(--ink-3); font-size: 13px; }
+  .funcao { margin-top: 24px; }
+  .funcao-topo { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 18px; }
+  .funcao-topo .icone { margin: 0; flex: none; }
+  .funcao-topo p { color: var(--ink-2); margin: 0; }
+  .colunas { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .colunas h4 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); margin: 0 0 8px; }
+  .colunas li { font-size: 15px; }
+  .rodape-funcao { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 14px; color: var(--ink-3); }
+
+  /* Selos */
+  .selo { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+  .ok { background: var(--ok-soft); color: var(--ok); }
+  .warn { background: var(--warn-soft); color: var(--warn); }
+  .info { background: var(--info-soft); color: var(--info); }
+  .bad { background: var(--red-soft); color: var(--red-deep); }
+  .neutro { background: var(--neutro-soft); color: var(--ink-2); }
+
+  /* Tabelas */
+  .tabela { background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: var(--sombra); }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th, td { text-align: left; vertical-align: top; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+  th { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); font-weight: 600; background: #fbfbfc; }
+  tr:last-child td { border-bottom: 0; }
+  td small { display: block; color: var(--ink-3); font-size: 13px; }
+
+  /* Legenda de status */
+  .legenda h3 { font-size: 16px; margin-bottom: 14px; }
+  .legenda dl { margin: 0; display: grid; gap: 12px; }
+  .legenda dt { margin: 0; }
+  .legenda dd { margin: 2px 0 0; color: var(--ink-2); font-size: 14px; }
+
+  /* SLA */
+  .formula { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; font-size: 18px; padding: 28px; text-align: center; }
+  .formula .fracao { display: inline-flex; flex-direction: column; align-items: center; }
+  .formula .fracao span:first-child { border-bottom: 2px solid var(--ink); padding: 0 10px 4px; }
+  .formula .fracao span:last-child { padding-top: 4px; }
+  .faixas { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 4px; }
+
+  /* Roteiro */
+  .roteiro .fase { font-size: 13px; font-weight: 700; color: var(--red); text-transform: uppercase; letter-spacing: .08em; }
+
+  /* Perguntas */
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 0 20px; margin-bottom: 10px; box-shadow: var(--sombra); }
+  summary { cursor: pointer; padding: 16px 0; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; color: var(--red); font-size: 22px; line-height: 1; font-weight: 400; }
+  details[open] summary::after { content: "–"; }
+  details p { color: var(--ink-2); padding-bottom: 16px; margin: 0; }
+
+  .destaque-nota { background: var(--info-soft); border-radius: 12px; padding: 16px 20px; color: var(--info); font-size: 15px; margin-top: 20px; }
+
+  footer { border-top: 1px solid var(--line); margin-top: 80px; }
+  .rodape { max-width: 1120px; margin: 0 auto; padding: 28px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; color: var(--ink-3); font-size: 14px; }
+
+  @media (max-width: 900px) {
+    .g3, .g4 { grid-template-columns: repeat(2, 1fr); }
+    .colunas { grid-template-columns: 1fr; gap: 16px; }
+    .capa h1 { font-size: 42px; }
+    .barra nav { display: none; }
+  }
+  @media (max-width: 600px) {
+    .g2, .g3, .g4 { grid-template-columns: 1fr; }
+    .capa-conteudo { padding: 48px 20px 56px; }
+    main { padding: 0 20px 60px; }
+  }
+  @media print {
+    body { background: #fff; font-size: 13px; }
+    .barra { display: none; }
+    .capa { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .cartao, .tabela, details { box-shadow: none; break-inside: avoid; }
+    details > p { display: block; }
+    section { padding-top: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="barra">
+  <div class="barra-conteudo">
+    <span class="marca"><b>Ark</b>Transp</span>
+    <nav aria-label="Seções">
+      <a href="#sobre">O que é</a>
+      <a href="#como">Como funciona</a>
+      <a href="#funcionalidades">Funcionalidades</a>
+      <a href="#planilhas">Planilhas</a>
+      <a href="#status">Status</a>
+      <a href="#sla">SLA</a>
+      <a href="#proximos">Próximos passos</a>
+      <a href="#perguntas">Dúvidas</a>
+    </nav>
+  </div>
+</header>
+
+<div class="capa">
+  <div class="capa-conteudo">
+    <small>Arklok · Operações e Logística</small>
+    <h1>ArkTransp</h1>
+    <p>Notas fiscais, entregas, SLA das transportadoras e baixa de tickets do Zendesk em um só lugar.</p>
+    <div class="chips">
+      <span class="chip">Substitui o cruzamento manual no Excel</span>
+      <span class="chip">Funciona no navegador</span>
+      <span class="chip">Nenhum dado sai da máquina</span>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- O que é ============================================================ -->
+  <section id="sobre">
+    <span class="rotulo">O que é</span>
+    <h2>Uma central para acompanhar cada nota até a entrega</h2>
+    <p class="intro">A equipe exporta os relatórios que já usa no dia a dia (Protheus, Intelipost, transportadoras e Zendesk) e arrasta os arquivos para o ArkTransp. O sistema cruza as informações e mostra o que precisa de ação.</p>
+
+    <div class="grade g2">
+      <div class="cartao problema">
+        <b>Nota que não chegou na Intelipost</b>
+        <div class="antes">Sem integração, a entrega não é rastreada nem cobrada.</div>
+        <div class="depois">a lista de notas não integradas aparece na hora, com espaço para registrar a tratativa.</div>
+      </div>
+      <div class="cartao problema">
+        <b>Ticket aberto com a entrega já feita</b>
+        <div class="antes">Tickets ficavam parados em "Em rota de entrega".</div>
+        <div class="depois">o sistema aponta os tickets prontos para baixa e gera a planilha de baixa em massa.</div>
+      </div>
+      <div class="cartao problema">
+        <b>Atrasos sem visibilidade</b>
+        <div class="antes">Não havia um número único de entrega no prazo.</div>
+        <div class="depois">painel com % no prazo por transportadora, região e semana.</div>
+      </div>
+      <div class="cartao problema">
+        <b>Conferir listas de NFs levava horas</b>
+        <div class="antes">PROCV entre várias planilhas para saber o que foi entregue.</div>
+        <div class="depois">arraste a lista e veja linha a linha o que foi entregue e se foi no prazo.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Como funciona ======================================================= -->
+  <section id="como">
+    <span class="rotulo">Como funciona</span>
+    <h2>Três passos</h2>
+    <p class="intro">Não há instalação nem cadastro. Tudo entra por planilha e o sistema guarda o histórico sozinho.</p>
+
+    <div class="grade g3">
+      <div class="cartao passo">
+        <div class="numero">1</div>
+        <h3>Exporte</h3>
+        <p class="texto">Baixe os relatórios de sempre: Alloca07, Intelipost, portais das transportadoras e Zendesk.</p>
+      </div>
+      <div class="cartao passo">
+        <div class="numero">2</div>
+        <h3>Arraste</h3>
+        <p class="texto">Solte cada arquivo no lugar indicado. O sistema reconhece o formato e mostra uma prévia antes de gravar.</p>
+      </div>
+      <div class="cartao passo">
+        <div class="numero">3</div>
+        <h3>Aja</h3>
+        <p class="texto">Veja as prioridades do dia, cobre atrasos, trate pendências e dê baixa nos tickets.</p>
+      </div>
+    </div>
+
+    <div class="grade g2" style="margin-top:20px">
+      <div class="cartao">
+        <h3 style="margin-bottom:18px">Rotina do dia</h3>
+        <ol class="tempo">
+          <li><b>Alloca07 + Intelipost</b><span>Monta o cruzamento das notas e libera as outras telas.</span></li>
+          <li><b>Transações da Intelipost e transportadoras</b><span>Atualizam a situação de entrega de cada nota.</span></li>
+          <li><b>Tickets do Zendesk + NF dos romaneios</b><span>Ligam cada ticket às suas notas.</span></li>
+          <li class="opcional"><b>Relatório de Expedição</b> <span>(opcional) Mede o tempo da saída até a entrega.</span></li>
+          <li><b>Trabalhar as prioridades</b><span>A tela Início lista o que resolver primeiro.</span></li>
+        </ol>
+      </div>
+      <div class="cartao">
+        <h3>Sem botão de salvar</h3>
+        <p class="texto">Tudo o que é enviado fica guardado automaticamente e vai formando um histórico por mês. Dá para abrir os dados de um dia anterior para consulta e exportar qualquer mês em Excel.</p>
+        <h3 style="margin-top:20px">Prévia antes de gravar</h3>
+        <p class="texto">Antes de substituir os dados, o sistema mostra quantas linhas entraram e avisa se algo parece errado: arquivo já enviado hoje, período incompleto, datas antigas ou planilha de outra transportadora.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Funcionalidades ===================================================== -->
+  <section id="funcionalidades">
+    <span class="rotulo">Funcionalidades</span>
+    <h2>O que cada tela faz</h2>
+    <p class="intro">Seis áreas, cada uma respondendo a uma pergunta da operação.</p>
+
+    <div class="grade g3 atalhos">
+      <a class="cartao" href="#f-inicio"><span class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><span>Início<small>O que resolver hoje?</small></span></a>
+      <a class="cartao" href="#f-integracoes"><span class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></span><span>Integrações de NF<small>A nota chegou na Intelipost?</small></span></a>
+      <a class="cartao" href="#f-zendesk"><span class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span>Baixa Zendesk<small>Qual ticket já pode fechar?</small></span></a>
+      <a class="cartao" href="#f-entregas"><span class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4h14v12H1z"/><path d="M15 9h4l3 3v4h-7"/><circle cx="5.5" cy="18.5" r="2"/><circle cx="18.5" cy="18.5" r="2"/></svg></span><span>Entregas<small>Esta lista foi entregue?</small></span></a>
+      <a class="cartao" href="#f-painel"><span class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></span><span>Painel de SLA<small>Estamos entregando no prazo?</small></span></a>
+      <a class="cartao" href="#f-banco"><span class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></span><span>Banco de dados<small>Como estava no mês passado?</small></span></a>
+    </div>
+
+    <!-- Início -->
+    <div class="cartao funcao" id="f-inicio">
+      <div class="funcao-topo">
+        <span class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span>
+        <div><h3>Início</h3><p>O resumo do dia: números principais, o que precisa de atenção e quais planilhas ainda faltam enviar.</p></div>
+      </div>
+      <div class="colunas">
+        <div>
+          <h4>O que mostra</h4>
+          <ul>
+            <li>Notas do período e % integradas</li>
+            <li>Pendências de integração</li>
+            <li>% de notas entregues e entregas atrasadas</li>
+            <li>Tickets abertos e prontos para baixa</li>
+            <li>Entregas por transportadora (entregues, em rota, atrasadas, sem rastreio)</li>
+          </ul>
+        </div>
+        <div>
+          <h4>O que você pode fazer</h4>
+          <ul>
+            <li>Seguir a lista de <b>Prioridades</b>, já na ordem em que vale a pena resolver</li>
+            <li>Clicar em qualquer número para abrir a lista correspondente</li>
+            <li>Conferir no checklist <b>Planilhas do dia</b> o que já foi enviado hoje e o que está desatualizado</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Integrações -->
+    <div class="cartao funcao" id="f-integracoes">
+      <div class="funcao-topo">
+        <span class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></span>
+        <div><h3>Integrações de NF</h3><p>Confere se toda nota emitida na Alloca07 chegou na Intelipost, pelo número da nota ou pela NF triangular.</p></div>
+      </div>
+      <div class="colunas">
+        <div>
+          <h4>O que mostra</h4>
+          <ul>
+            <li>Cada nota com cliente, tipo, emissão, data de integração e transportadora</li>
+            <li>Notas emitidas e integradas em dias diferentes (marcadas como anormais)</li>
+            <li>Tickets do Zendesk ligados à nota</li>
+          </ul>
+        </div>
+        <div>
+          <h4>O que você pode fazer</h4>
+          <ul>
+            <li>Filtrar por status, tipo da nota, mês, dia de emissão, tratativa e ticket</li>
+            <li>Registrar a <b>tratativa</b>: comentário, PDV, nota antiga e nota nova</li>
+            <li>Exportar a lista em CSV</li>
+          </ul>
+        </div>
+      </div>
+      <div class="rodape-funcao">
+        <span class="selo ok">Integrada</span><span class="selo warn">Não integrada</span><span class="selo info">Só Intelipost</span>
+        <span>Notas de remanejamento fiscal e as emitidas hoje ficam fora.</span>
+      </div>
+    </div>
+
+    <!-- Zendesk -->
+    <div class="cartao funcao" id="f-zendesk">
+      <div class="funcao-topo">
+        <span class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+        <div><h3>Baixa Zendesk</h3><p>Mostra os tickets em "Em rota de entrega" e "Aguardando expedição" e aponta os que já podem ser fechados.</p></div>
+      </div>
+      <div class="colunas">
+        <div>
+          <h4>O que mostra</h4>
+          <ul>
+            <li>Cada ticket com suas NFs, transportadora, data de entrega e recebedor</li>
+            <li>Aba <b>Já entregues — dar baixa</b>: tickets com todas as NFs entregues</li>
+            <li>Abas separadas para Frota interna e Lalamove</li>
+            <li>Se o romaneio do ticket já tem NF em todas as linhas</li>
+          </ul>
+        </div>
+        <div>
+          <h4>O que você pode fazer</h4>
+          <ul>
+            <li>Buscar por ticket, NF, romaneio, organização ou UF</li>
+            <li><b>Copiar as NFs</b> da lista para colar numa busca em lote</li>
+            <li>Gerar a planilha de <b>baixa em massa</b> no modelo do Zendesk</li>
+            <li>Exportar a aba atual ou todos os tickets</li>
+          </ul>
+        </div>
+      </div>
+      <div class="rodape-funcao">
+        <span class="selo ok">Com NF</span><span class="selo warn">Sem NF</span><span class="selo bad">Fora da planilha</span>
+        <span>Um ticket só fica pronto para baixa quando <b>todas</b> as NFs dele foram entregues.</span>
+      </div>
+    </div>
+
+    <!-- Entregas -->
+    <div class="cartao funcao" id="f-entregas">
+      <div class="funcao-topo">
+        <span class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4h14v12H1z"/><path d="M15 9h4l3 3v4h-7"/><circle cx="5.5" cy="18.5" r="2"/><circle cx="18.5" cy="18.5" r="2"/></svg></span>
+        <div><h3>Entregas</h3><p>Confere uma lista de NFs (Alloca08, exportação do Zendesk ou qualquer planilha com coluna de NF) contra as entregas das transportadoras.</p></div>
+      </div>
+      <div class="colunas">
+        <div>
+          <h4>O que mostra</h4>
+          <ul>
+            <li>Para cada linha: se foi entregue, quando, por qual transportadora e quem recebeu</li>
+            <li>Previsão de entrega e situação de SLA de cada nota</li>
+            <li>Quadro de <b>% no prazo por região</b></li>
+            <li>Tipo da nota, região, cidade e data de emissão</li>
+          </ul>
+        </div>
+        <div>
+          <h4>O que você pode fazer</h4>
+          <ul>
+            <li>Filtrar por tipo, região, situação de SLA, período de emissão e mês</li>
+            <li>Ver só o que está dentro ou fora do SLA</li>
+            <li>Copiar as NFs, gerar a baixa em massa e exportar em Excel</li>
+            <li>Somar vários arquivos da Jamef (o portal só exporta 30 dias por vez)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="rodape-funcao">
+        <span class="selo ok">Todas entregues</span><span class="selo info">Parte entregue</span><span class="selo warn">Não entregues</span><span class="selo neutro">Frota / Lalamove</span><span class="selo bad">Não encontradas</span>
+      </div>
+    </div>
+
+    <!-- Painel -->
+    <div class="cartao funcao" id="f-painel">
+      <div class="funcao-topo">
+        <span class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></span>
+        <div><h3>Painel de SLA</h3><p>Mede se as transportadoras estão entregando no prazo, no estilo dos painéis de Power BI da Arklok.</p></div>
+      </div>
+      <div class="colunas">
+        <div>
+          <h4>O que mostra</h4>
+          <ul>
+            <li>% dentro do SLA, entregues no prazo, com atraso e vencidas</li>
+            <li>Comparativo entre SPfly, Jamef e Certex</li>
+            <li>% no prazo por região e tendência das últimas 12 semanas</li>
+            <li>Cidades com mais problemas</li>
+            <li>Lead time: dias úteis da saída da Arklok até a entrega</li>
+          </ul>
+        </div>
+        <div>
+          <h4>O que você pode fazer</h4>
+          <ul>
+            <li>Filtrar por transportadora, região e mês</li>
+            <li>Clicar num indicador ou gráfico para ver as notas daquela situação</li>
+            <li>Ver os <b>tickets em atraso sem entrega</b>, copiar os números e cobrar</li>
+            <li>Exportar o detalhe das notas em Excel</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Banco -->
+    <div class="cartao funcao" id="f-banco">
+      <div class="funcao-topo">
+        <span class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></span>
+        <div><h3>Banco de dados</h3><p>Fica no botão do topo. É o histórico que o sistema monta sozinho a cada planilha enviada, separado por mês.</p></div>
+      </div>
+      <div class="colunas">
+        <div>
+          <h4>O que mostra</h4>
+          <ul>
+            <li>Quantidade de notas e situação das entregas de cada mês</li>
+            <li>Resumo de cada dia em que houve atualização</li>
+            <li>Problemas encontrados no histórico (dados duplicados, datas estranhas)</li>
+          </ul>
+        </div>
+        <div>
+          <h4>O que você pode fazer</h4>
+          <ul>
+            <li>Exportar um mês ou o histórico completo em Excel</li>
+            <li>Exportar só o que está carregado agora</li>
+            <li>Abrir os dados de um dia anterior (só para consulta)</li>
+            <li>Guardar tudo e limpar as planilhas para começar uma nova importação</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ferramentas -->
+    <div class="grade g3" style="margin-top:24px">
+      <div class="cartao">
+        <span class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+        <h3>Busca rápida</h3>
+        <p class="texto">Aperte <b>Ctrl + K</b> e digite uma NF, um ticket ou um cliente. O sistema mostra onde ele aparece e leva direto até lá.</p>
+      </div>
+      <div class="cartao">
+        <span class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>
+        <h3>Período de emissão</h3>
+        <p class="texto">O calendário do topo filtra todas as telas de uma vez pela data de emissão das notas.</p>
+      </div>
+      <div class="cartao">
+        <span class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg></span>
+        <h3>Exportações</h3>
+        <p class="texto">Toda lista vira Excel. As do Banco de dados podem ir direto para uma pasta escolhida por você.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Planilhas =========================================================== -->
+  <section id="planilhas">
+    <span class="rotulo">Planilhas</span>
+    <h2>O que alimenta o sistema</h2>
+    <p class="intro">Basta exportar dos sistemas de sempre. O ArkTransp reconhece as colunas sozinho, em .xlsx, .xls ou .csv.</p>
+    <div class="tabela">
+      <table>
+        <thead><tr><th>Planilha</th><th>De onde vem</th><th>Onde enviar</th><th>Frequência</th></tr></thead>
+        <tbody>
+          <tr><td><b>Alloca07</b><small>notas emitidas</small></td><td>Protheus</td><td>Integrações de NF</td><td>Diária</td></tr>
+          <tr><td><b>Intelipost</b><small>relatório de envios</small></td><td>Portal Intelipost</td><td>Integrações de NF, junto com a Alloca07</td><td>Diária</td></tr>
+          <tr><td><b>Transações Intelipost</b><small>status de entrega</small></td><td>Portal Intelipost</td><td>Entregas</td><td>Diária</td></tr>
+          <tr><td><b>SPfly · Jamef · Certex</b><small>relatórios de entrega</small></td><td>Portais das transportadoras</td><td>Entregas (alimenta também o Painel)</td><td>Diária</td></tr>
+          <tr><td><b>Tickets do Zendesk</b><small>relatório Aging</small></td><td>Zendesk Explore</td><td>Baixa Zendesk</td><td>Diária</td></tr>
+          <tr><td><b>NF dos romaneios</b><small>aba Base_Dados</small></td><td>Planilha interna</td><td>Baixa Zendesk</td><td>Diária</td></tr>
+          <tr><td><b>Relatório de Expedição</b></td><td>Base de expedição</td><td>Painel</td><td>Opcional</td></tr>
+          <tr><td><b>Planilha base</b><small>lista para conferir</small></td><td>Alloca08 ou qualquer lista com NF</td><td>Entregas</td><td>Quando precisar</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Status ============================================================== -->
+  <section id="status">
+    <span class="rotulo">Status</span>
+    <h2>Entendendo as cores</h2>
+    <p class="intro">Verde está resolvido, amarelo e azul pedem acompanhamento, e vermelho pede ação.</p>
+    <div class="grade g3">
+      <div class="cartao legenda">
+        <h3>Integração</h3>
+        <dl>
+          <div><dt><span class="selo ok">Integrada</span></dt><dd>A nota (ou a NF triangular) está na Intelipost.</dd></div>
+          <div><dt><span class="selo warn">Não integrada</span></dt><dd>Está na Alloca07, mas não chegou na Intelipost.</dd></div>
+          <div><dt><span class="selo info">Só Intelipost</span></dt><dd>Está na Intelipost e não existe na Alloca07.</dd></div>
+        </dl>
+      </div>
+      <div class="cartao legenda">
+        <h3>Entrega</h3>
+        <dl>
+          <div><dt><span class="selo ok">Entregue</span></dt><dd>A transportadora confirmou a entrega.</dd></div>
+          <div><dt><span class="selo warn">Em trânsito</span></dt><dd>Saiu, mas ainda não foi entregue.</dd></div>
+          <div><dt><span class="selo bad">Devolução</span></dt><dd>A carga voltou.</dd></div>
+          <div><dt><span class="selo bad">Não encontrada</span></dt><dd>A nota não aparece em nenhum relatório de entrega.</dd></div>
+        </dl>
+      </div>
+      <div class="cartao legenda">
+        <h3>SLA</h3>
+        <dl>
+          <div><dt><span class="selo ok">No prazo</span></dt><dd>Entregue até a data prevista.</dd></div>
+          <div><dt><span class="selo info">Em trânsito no prazo</span></dt><dd>A previsão ainda não chegou.</dd></div>
+          <div><dt><span class="selo bad">Com atraso</span></dt><dd>Entregue depois da previsão.</dd></div>
+          <div><dt><span class="selo bad">Vencida</span></dt><dd>A previsão passou e não houve entrega.</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLA ================================================================= -->
+  <section id="sla">
+    <span class="rotulo">SLA</span>
+    <h2>Como medimos o prazo</h2>
+    <p class="intro">A data em que a nota foi entregue é comparada com a <b>previsão de entrega informada pela transportadora</b>. Os atrasos são contados em dias úteis, de segunda a sexta.</p>
+    <div class="grade g2">
+      <div class="cartao">
+        <div class="formula">
+          <b>% dentro do SLA</b> =
+          <span class="fracao"><span>entregues no prazo</span><span>no prazo + com atraso + vencidas</span></span>
+        </div>
+        <div class="faixas">
+          <span class="selo ok">95% ou mais · meta</span>
+          <span class="selo warn">85% a 95%</span>
+          <span class="selo bad">abaixo de 85%</span>
+        </div>
+      </div>
+      <div class="cartao">
+        <h3>Regiões</h3>
+        <p class="texto">Cada nota entra na região do estado de destino, conforme o IBGE.</p>
+        <ul class="texto">
+          <li><b>Sudeste:</b> SP, RJ, MG, ES</li>
+          <li><b>Sul:</b> PR, SC, RS</li>
+          <li><b>Centro-Oeste:</b> DF, GO, MT, MS</li>
+          <li><b>Nordeste:</b> BA, SE, AL, PE, PB, RN, CE, PI, MA</li>
+          <li><b>Norte:</b> AM, PA, AP, RR, RO, AC, TO</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Segurança =========================================================== -->
+  <section id="seguranca">
+    <span class="rotulo">Segurança</span>
+    <h2>Os dados ficam com você</h2>
+    <div class="grade g3">
+      <div class="cartao">
+        <span class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>
+        <h3>Na sua máquina</h3>
+        <p class="texto">As planilhas são lidas no próprio navegador e não são enviadas para nenhum servidor.</p>
+      </div>
+      <div class="cartao">
+        <span class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+        <h3>Sem conexão externa</h3>
+        <p class="texto">O sistema é bloqueado para não acessar a internet. Nenhuma API, rastreador ou serviço de terceiros.</p>
+      </div>
+      <div class="cartao">
+        <span class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg></span>
+        <h3>Backup em Excel</h3>
+        <p class="texto">O histórico completo pode ser exportado a qualquer momento pelo Banco de dados.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Próximos passos ===================================================== -->
+  <section id="proximos">
+    <span class="rotulo">Próximos passos</span>
+    <h2>Para onde o ArkTransp vai</h2>
+    <p class="intro">Hoje cada pessoa tem os dados no próprio computador. O próximo passo é levar a base para o servidor da empresa.</p>
+    <div class="grade g4 roteiro">
+      <div class="cartao">
+        <div class="fase">Fase 1</div>
+        <h3>Banco no servidor</h3>
+        <p class="texto">Uma base única para toda a equipe, com login pela conta da rede e backup feito pela TI.</p>
+      </div>
+      <div class="cartao">
+        <div class="fase">Fase 2</div>
+        <h3>Trazer o histórico</h3>
+        <p class="texto">Levar para o servidor os dados e as tratativas que já estão no sistema, conferindo os totais de cada mês.</p>
+      </div>
+      <div class="cartao">
+        <div class="fase">Fase 3</div>
+        <h3>Power BI e feriados</h3>
+        <p class="texto">Painéis do Power BI lendo direto do banco, e feriados entrando no cálculo de prazo.</p>
+      </div>
+      <div class="cartao">
+        <div class="fase">Fase 4</div>
+        <h3>Sem planilhas</h3>
+        <p class="texto">Buscar os dados da Intelipost e do Zendesk automaticamente, sem exportar arquivos.</p>
+      </div>
+    </div>
+    <div class="destaque-nota">Para a equipe de TI: o plano técnico completo (arquitetura, modelo do banco, API e decisões em aberto) está no <a href="tecnico.html#migracao">documento técnico</a>.</div>
+  </section>
+
+  <!-- Perguntas =========================================================== -->
+  <section id="perguntas">
+    <span class="rotulo">Dúvidas</span>
+    <h2>Perguntas frequentes</h2>
+    <div style="max-width:820px">
+      <details>
+        <summary>Preciso salvar alguma coisa?</summary>
+        <p>Não. Tudo o que é enviado fica guardado automaticamente, e o histórico do mês vai sendo montado sozinho.</p>
+      </details>
+      <details>
+        <summary>Enviei a planilha errada. E agora?</summary>
+        <p>Envie a planilha certa no mesmo lugar. Ela substitui a anterior, sem duplicar nada.</p>
+      </details>
+      <details>
+        <summary>Por que a nota emitida hoje não aparece?</summary>
+        <p>Notas emitidas no dia ainda não tiveram tempo de integrar. Elas entram no cruzamento a partir do dia seguinte, para não aparecerem como pendência por engano.</p>
+      </details>
+      <details>
+        <summary>Por que o ticket não aparece como pronto para baixa?</summary>
+        <p>O ticket só fica pronto quando todas as linhas do romaneio têm NF e todas essas NFs constam como entregues. Se só parte foi entregue, ele espera.</p>
+      </details>
+      <details>
+        <summary>Por que os números do Painel são diferentes dos da tela Entregas?</summary>
+        <p>O Painel usa só os relatórios da SPfly, da Jamef e da Certex, que trazem a previsão de entrega. A tela Entregas confere a sua lista com todas as fontes, incluindo as transações da Intelipost.</p>
+      </details>
+      <details>
+        <summary>A Jamef só exporta 30 dias. Como faço?</summary>
+        <p>Use o botão "Adicionar" no cartão da Jamef para somar quantos arquivos precisar. Linhas repetidas entram uma vez só.</p>
+      </details>
+      <details>
+        <summary>Outra pessoa consegue ver os meus dados?</summary>
+        <p>Hoje não: os dados ficam no navegador de cada computador. Isso muda com o banco no servidor da empresa (Fase 1 dos próximos passos).</p>
+      </details>
+      <details>
+        <summary>Como faço backup?</summary>
+        <p>No topo, abra Banco de dados e exporte o histórico completo. O arquivo Excel tem tudo o que foi guardado.</p>
+      </details>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="rodape">
+    <span><b>ArkTransp</b> · Arklok Operações e Logística · Responsável: Diogo Silva</span>
+    <span>Atualizado em 15/10/2026 · <a href="processo.html">Documentação do processo</a> · <a href="tecnico.html">Documento técnico (TI)</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

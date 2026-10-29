@@ -1,0 +1,11 @@
+---
+description: Use the installed frontend skills when changing UI, without migrating the stack.
+globs: src/**/*.{tsx,css}
+alwaysApply: false
+---
+
+# Frontend da Torre
+
+Antes de alterar UI, leia `.cursor/skills/torre-front/SKILL.md`, depois `frontend-design` e `ui-ux-pro-max`.
+
+Não instale Next, Tailwind, shadcn, Radix ou Lucide. A stack é Vite + React + CSS com tokens em `src/styles.css`. Use os padrões do shadcn (composição, foco, dialog, tabela) em cima das classes que já existem.

@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Documentação Indicadores Logística · ArkTransp</title>
+<style>
+  :root {
+    --red: #e30613;
+    --red-escuro: #b0000c;
+    --ink: #1f2328;
+    --muted: #5b6470;
+    --linha: #d5d9df;
+    --fundo-tabela: #f4f5f7;
+    --preencher: #fff4c2;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: #e9ebef; color: var(--ink); font: 14px/1.55 "Segoe UI", Roboto, Arial, sans-serif; }
+
+  .aviso { max-width: 210mm; margin: 20px auto 0; padding: 10px 16px; border-radius: 8px; background: #fff; border: 1px solid var(--linha); color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; }
+  .aviso a { color: var(--red); font-weight: 600; text-decoration: none; }
+  .aviso .preencher { font-style: normal; }
+
+  .folha { max-width: 210mm; margin: 16px auto 40px; background: #fff; padding: 18mm 16mm; box-shadow: 0 2px 14px rgba(0,0,0,.08); }
+
+  .cabecalho { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 18px; padding-bottom: 14px; border-bottom: 3px solid var(--red); margin-bottom: 26px; }
+  .logo { font-weight: 800; font-size: 22px; letter-spacing: 2px; color: var(--red); }
+  .cabecalho h1 { margin: 0; font-size: 17px; letter-spacing: .5px; text-align: center; }
+  .cabecalho h1 small { display: block; font-size: 12px; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+  .cabecalho .codigo { font-size: 12px; color: var(--muted); text-align: right; line-height: 1.4; }
+
+  section { margin-bottom: 26px; break-inside: avoid-page; }
+  section.longa { break-inside: auto; }
+  h2 { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; padding: 7px 12px; background: var(--fundo-tabela); border-left: 4px solid var(--red); font-size: 14px; letter-spacing: .4px; text-transform: uppercase; }
+  h2 .n { display: inline-grid; place-items: center; min-width: 24px; height: 24px; border-radius: 50%; background: var(--red); color: #fff; font-size: 12px; }
+  h3 { font-size: 13px; margin: 16px 0 6px; }
+  p { margin: 0 0 8px; }
+  ul { margin: 0 0 8px; padding-left: 20px; }
+  li { margin-bottom: 3px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { border: 1px solid var(--linha); padding: 7px 9px; text-align: left; vertical-align: top; }
+  th { background: #3a3f47; color: #fff; font-weight: 600; font-size: 12px; }
+  td.rotulo { background: var(--fundo-tabela); font-weight: 600; width: 22%; }
+  td.centro, th.centro { text-align: center; }
+  tr { break-inside: avoid; }
+
+  .preencher { background: var(--preencher); border-bottom: 1px dashed #c9a400; padding: 0 3px; font-style: italic; color: #6b5600; }
+  .marca-check { font-size: 15px; margin-right: 4px; }
+  .tipos span { margin-right: 14px; white-space: nowrap; }
+
+  .def { display: grid; grid-template-columns: 170px 1fr; border: 1px solid var(--linha); }
+  .def dt, .def dd { margin: 0; padding: 6px 9px; border-bottom: 1px solid var(--linha); }
+  .def dt { background: var(--fundo-tabela); font-weight: 600; }
+  .def dt:nth-last-of-type(1), .def dd:last-child { border-bottom: 0; }
+
+  .faixa { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px; font-weight: 600; }
+  .verde { background: #dcf3e3; color: #146c2e; }
+  .amarelo { background: #fff0c2; color: #7a5b00; }
+  .vermelho { background: #fde0e0; color: #a1121b; }
+
+  /* Fluxo */
+  .fluxo { border: 1px solid var(--linha); border-radius: 8px; padding: 18px 14px; background: #fafbfc; }
+  .coluna { display: flex; flex-direction: column; align-items: center; }
+  .no { background: #fff; border: 1.5px solid #3a3f47; border-radius: 6px; padding: 8px 12px; text-align: center; font-size: 12.5px; max-width: 340px; }
+  .no small { display: block; color: var(--muted); font-size: 11.5px; }
+  .no.terminal { border-radius: 20px; background: var(--red); border-color: var(--red); color: #fff; font-weight: 600; padding: 6px 20px; }
+  .no.decisao { border-color: #c98a00; background: #fff8e1; }
+  .no.acao { border-color: var(--red); }
+  .seta { width: 2px; height: 18px; background: #3a3f47; position: relative; margin-bottom: 6px; }
+  .seta::after { content: ""; position: absolute; left: -4px; bottom: -6px; border: 5px solid transparent; border-top: 6px solid #3a3f47; }
+  .ramo { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: var(--muted); }
+  .ramo .no { font-size: 11.5px; }
+  .raias { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; }
+  .raia { border: 1px dashed #aab1bb; border-radius: 8px; padding: 10px 8px; display: flex; flex-direction: column; align-items: center; background: #fff; }
+  .raia > b { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--red); margin-bottom: 8px; }
+  .raia .no { width: 100%; }
+  .sim-nao { font-size: 11px; color: var(--muted); margin: 2px 0 4px; }
+
+  .checklist { list-style: none; padding: 0; }
+  .checklist li { padding: 5px 0; border-bottom: 1px solid #eef0f3; }
+
+  .assinaturas td { height: 64px; vertical-align: bottom; }
+
+  .rodape-doc { margin-top: 30px; padding-top: 10px; border-top: 1px solid var(--linha); display: flex; justify-content: space-between; font-size: 11.5px; color: var(--muted); }
+
+  @media (max-width: 800px) {
+    .folha { padding: 20px 14px; }
+    .raias { grid-template-columns: 1fr; }
+    .def { grid-template-columns: 1fr; }
+    .tabela-rolagem { overflow-x: auto; }
+  }
+
+  @page { size: A4; margin: 14mm 12mm; }
+  @media print {
+    body { background: #fff; font-size: 12px; }
+    .aviso { display: none; }
+    .folha { margin: 0; padding: 0; box-shadow: none; max-width: none; }
+    .preencher { background: none; border-bottom: 1px dashed #999; color: #555; }
+    h2, th, td.rotulo, h2 .n, .no.terminal, .faixa { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="aviso">
+  <span>Para gerar o PDF: <b>Ctrl + P</b> → Salvar como PDF.</span>
+  <span><i class="preencher">Campos em amarelo</i> ainda precisam ser preenchidos ou confirmados.</span>
+  <a href="index.html">Guia do sistema</a>
+  <a href="tecnico.html">Documento técnico</a>
+</div>
+
+<div class="folha">
+
+  <header class="cabecalho">
+    <span class="logo">ARKLOK</span>
+    <h1>DOCUMENTAÇÃO INDICADORES LOGÍSTICA<small>Acompanhamento de NF, entregas e SLA · ArkTransp</small></h1>
+    <span class="codigo">Código: <b class="preencher">LOG-TRA-001</b><br>Versão 1.0</span>
+  </header>
+
+  <!-- 1 ==================================================================== -->
+  <section>
+    <h2><span class="n">1</span>Identificação do processo</h2>
+    <table>
+      <tr><td class="rotulo">Nome do Processo</td><td colspan="3">Acompanhamento de indicadores logísticos: integração de NF, entregas, SLA das transportadoras e baixa de tickets (ArkTransp)</td></tr>
+      <tr><td class="rotulo">Código</td><td><span class="preencher">LOG-TRA-001</span></td><td class="rotulo">Área</td><td>Operações e Logística</td></tr>
+      <tr><td class="rotulo">Versão</td><td>1.0</td><td class="rotulo">Dono do Processo</td><td>Diogo Silva · <span class="preencher">cargo</span></td></tr>
+      <tr><td class="rotulo">Data da última revisão</td><td>15/10/2026</td><td class="rotulo">Próxima revisão</td><td>15/04/2027</td></tr>
+      <tr><td class="rotulo">Tipo de Documento</td><td colspan="3" class="tipos"><span><span class="marca-check">☒</span>Processo</span><span><span class="marca-check">☐</span>Procedimento</span><span><span class="marca-check">☐</span>POP</span><span><span class="marca-check">☐</span>Fluxo</span></td></tr>
+    </table>
+  </section>
+
+  <!-- 2 ==================================================================== -->
+  <section>
+    <h2><span class="n">2</span>Objetivo</h2>
+    <p>Garantir que toda nota fiscal emitida pela Arklok seja integrada à Intelipost, acompanhada até a entrega e medida contra o prazo informado pela transportadora. O processo também garante que os tickets do Zendesk sejam baixados assim que todas as entregas forem confirmadas.</p>
+    <p><b>Resultado esperado:</b></p>
+    <ul>
+      <li>nenhuma nota sem integração fica sem tratativa registrada;</li>
+      <li>atrasos e entregas vencidas são identificados e cobrados no mesmo dia;</li>
+      <li>tickets com entrega concluída são baixados sem atraso;</li>
+      <li>indicadores de integração, entrega e SLA disponíveis todos os dias, por transportadora e por região.</li>
+    </ul>
+  </section>
+
+  <!-- 3 ==================================================================== -->
+  <section>
+    <h2><span class="n">3</span>Escopo</h2>
+    <table>
+      <tr><td class="rotulo">Início</td><td>Exportação diária dos relatórios de origem: Alloca07 (Protheus), Intelipost, portais das transportadoras e Zendesk.</td></tr>
+      <tr><td class="rotulo">Fim</td><td>Tratativas registradas, transportadoras cobradas, baixa em massa importada no Zendesk e indicadores disponíveis no ArkTransp e exportados para o histórico mensal.</td></tr>
+      <tr><td class="rotulo">Fora do escopo</td><td>
+        <ul style="margin:0">
+          <li>Emissão e correção fiscal da NF (responsabilidade do Faturamento/Fiscal).</li>
+          <li>Separação, carregamento e roteirização física das cargas.</li>
+          <li>Contratação, negociação e pagamento de fretes.</li>
+          <li>Notas de <b>remanejamento fiscal</b>, que não geram transporte.</li>
+          <li>Medição de SLA de frota interna e Lalamove (acompanhadas em separado, sem previsão de transportadora).</li>
+        </ul>
+      </td></tr>
+    </table>
+  </section>
+
+  <!-- 4 ==================================================================== -->
+  <section>
+    <h2><span class="n">4</span>Abrangência</h2>
+    <ul>
+      <li><b>Notas:</b> todas as NFs emitidas na Alloca07 (Protheus) que seguem por transportadora integrada à Intelipost.</li>
+      <li><b>Transportadoras com SLA medido:</b> SPfly, Jamef e Certex.</li>
+      <li><b>Destinos:</b> todo o território nacional, agrupado nas cinco regiões do IBGE.</li>
+      <li><b>Tickets:</b> Zendesk nos status "Em rota de entrega" e "Aguardando expedição", incluindo frota interna e Lalamove.</li>
+      <li><b>Equipe:</b> analistas de Operações e Logística que executam a rotina diária no ArkTransp.</li>
+      <li><b>Unidades / centros de distribuição:</b> <span class="preencher">listar as unidades abrangidas</span></li>
+    </ul>
+  </section>
+
+  <!-- 5 ==================================================================== -->
+  <section class="longa">
+    <h2><span class="n">5</span>Definições e siglas</h2>
+    <dl class="def">
+      <dt>ArkTransp</dt><dd>Sistema interno que cruza as planilhas de NF, entregas e tickets e calcula os indicadores deste processo.</dd>
+      <dt>Alloca07</dt><dd>Relatório do Protheus com as notas fiscais emitidas.</dd>
+      <dt>Alloca08</dt><dd>Relatório do Protheus usado como lista de NFs para conferência de entrega.</dd>
+      <dt>Intelipost</dt><dd>Plataforma que recebe as notas e rastreia os envios junto às transportadoras.</dd>
+      <dt>Integração</dt><dd>Presença da NF na Intelipost. Sem ela, a entrega não é rastreada.</dd>
+      <dt>NF triangular</dt><dd>Nota vinculada à NF principal em operações triangulares. Se ela estiver na Intelipost, a nota é considerada integrada.</dd>
+      <dt>Remanejamento fiscal</dt><dd>Tipo de nota que não envolve transporte e por isso não entra no cruzamento.</dd>
+      <dt>Só Intelipost</dt><dd>NF presente na Intelipost que não existe na Alloca07.</dd>
+      <dt>Tratativa</dt><dd>Registro da ação tomada para uma nota não integrada: comentário, PDV, nota antiga e nota nova.</dd>
+      <dt>Romaneio</dt><dd>Relação de NFs de um ticket/carga, mantida na planilha interna (aba Base_Dados).</dd>
+      <dt>Baixa em massa</dt><dd>Planilha no modelo do Zendesk usada para fechar vários tickets de uma vez.</dd>
+      <dt>SLA</dt><dd>Acordo de nível de serviço. Aqui, entrega até a <b>previsão informada pela transportadora</b>.</dd>
+      <dt>Previsão de entrega</dt><dd>Data prometida pela transportadora no relatório dela.</dd>
+      <dt>Vencida</dt><dd>Nota cuja previsão já passou sem registro de entrega.</dd>
+      <dt>Lead time</dt><dd>Dias úteis entre a saída da Arklok (Relatório de Expedição) e a entrega.</dd>
+      <dt>Dias úteis</dt><dd>Segunda a sexta. Feriados ainda não são descontados.</dd>
+      <dt>Aging</dt><dd>Relatório do Zendesk Explore com os tickets abertos e sua idade.</dd>
+      <dt>KPI</dt><dd>Key Performance Indicator, indicador-chave de desempenho.</dd>
+      <dt>RACI</dt><dd>Responsável, Aprovador, Consultado, Informado.</dd>
+      <dt>NF</dt><dd>Nota fiscal.</dd>
+      <dt>UF</dt><dd>Unidade da federação (estado) de destino.</dd>
+    </dl>
+  </section>
+
+  <!-- 6 ==================================================================== -->
+  <section>
+    <h2><span class="n">6</span>Áreas envolvidas</h2>
+    <div class="tabela-rolagem">
+    <table>
+      <thead><tr><th>Área</th><th>Local ou processo</th><th>Responsável da área afetada</th></tr></thead>
+      <tbody>
+        <tr><td><b>Operações e Logística</b></td><td>Dona do processo. Exporta e importa as planilhas, trata pendências, cobra transportadoras, dá baixa nos tickets e acompanha os indicadores.</td><td>Diogo Silva</td></tr>
+        <tr><td><b>Faturamento / Fiscal</b></td><td>Emite as NFs na Alloca07. Entra no processo quando uma nota não integrada precisa ser corrigida, cancelada ou reemitida.</td><td><span class="preencher">nome do responsável</span></td></tr>
+        <tr><td><b>Expedição</b></td><td>Despacha as cargas e mantém o Relatório de Expedição e os romaneios. Entra quando falta NF no romaneio ou a data de saída.</td><td><span class="preencher">nome do responsável</span></td></tr>
+        <tr><td><b>Atendimento (Zendesk)</b></td><td>Abre e acompanha os tickets de entrega. Recebe a baixa dos tickets entregues e é avisado sobre atrasos.</td><td><span class="preencher">nome do responsável</span></td></tr>
+        <tr><td><b>Transportadoras</b> (externo)</td><td>Fornecem relatórios de entrega e previsão. São acionadas quando há atraso, vencida ou devolução.</td><td><span class="preencher">contatos SPfly, Jamef, Certex</span></td></tr>
+        <tr><td><b>TI</b></td><td>Apoio à ferramenta e futura migração da base para o servidor da empresa.</td><td><span class="preencher">nome do responsável</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <!-- 7 ==================================================================== -->
+  <section>
+    <h2><span class="n">7</span>Sistemas envolvidos</h2>
+    <table>
+      <thead><tr><th style="width:28%">Sistema</th><th>Finalidade</th></tr></thead>
+      <tbody>
+        <tr><td><b>Protheus</b> (Alloca07 / Alloca08)</td><td>Origem das notas emitidas. Exportado no início da rotina diária.</td></tr>
+        <tr><td><b>Intelipost</b></td><td>Relatório de envios (cruzamento de integração) e de transações (status de entrega). Exportado diariamente.</td></tr>
+        <tr><td><b>Portais SPfly, Jamef e Certex</b></td><td>Relatórios de entrega com previsão. Base do cálculo de SLA.</td></tr>
+        <tr><td><b>Zendesk</b> (Explore e importação em massa)</td><td>Relatório Aging no início da rotina; importação da planilha de baixa em massa no fim.</td></tr>
+        <tr><td><b>Planilha de romaneios</b> (Base_Dados)</td><td>Liga cada ticket às suas NFs.</td></tr>
+        <tr><td><b>Relatório de Expedição</b></td><td>Data de saída da Arklok, usada no lead time (opcional).</td></tr>
+        <tr><td><b>ArkTransp</b></td><td>Recebe todas as planilhas, faz os cruzamentos, registra tratativas, calcula os indicadores e gera as exportações.</td></tr>
+        <tr><td><b>Excel</b></td><td>Exportações do ArkTransp (listas, baixa em massa e histórico mensal).</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 8 ==================================================================== -->
+  <section>
+    <h2><span class="n">8</span>Matriz de responsabilidades (RACI)</h2>
+    <div class="tabela-rolagem">
+    <table>
+      <thead><tr><th>Atividade</th><th>Responsável (R)</th><th>Aprovador (A)</th><th>Consultado (C)</th><th>Informado (I)</th></tr></thead>
+      <tbody>
+        <tr><td>Exportar e importar as planilhas do dia</td><td>Analista de Logística</td><td>Dono do processo</td><td>—</td><td>—</td></tr>
+        <tr><td>Conferir integração de NF e registrar tratativa</td><td>Analista de Logística</td><td>Dono do processo</td><td>Faturamento / Fiscal</td><td>Gestor de Logística</td></tr>
+        <tr><td>Corrigir ou reemitir NF não integrada</td><td>Faturamento / Fiscal</td><td><span class="preencher">gestor do Fiscal</span></td><td>Logística</td><td>Logística</td></tr>
+        <tr><td>Acompanhar entregas e cobrar transportadoras</td><td>Analista de Logística</td><td>Dono do processo</td><td>Transportadoras</td><td>Atendimento</td></tr>
+        <tr><td>Gerar e importar a baixa em massa no Zendesk</td><td>Analista de Logística</td><td>Dono do processo</td><td>Atendimento</td><td>Atendimento</td></tr>
+        <tr><td>Apurar e divulgar os indicadores de SLA</td><td>Analista de Logística</td><td><span class="preencher">Gestor de Logística</span></td><td>Transportadoras</td><td><span class="preencher">Diretoria / Compras</span></td></tr>
+        <tr><td>Manter o ArkTransp e esta documentação</td><td>Diogo Silva</td><td><span class="preencher">Gestor de Logística</span></td><td>TI</td><td>Usuários do sistema</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <!-- 9 ==================================================================== -->
+  <section>
+    <h2><span class="n">9</span>Fluxo do processo</h2>
+    <div class="fluxo">
+      <div class="coluna">
+        <div class="no terminal">Início do dia</div>
+        <div class="seta"></div>
+        <div class="no">Exportar relatórios<small>Alloca07 · Intelipost · transportadoras · Zendesk · romaneios</small></div>
+        <div class="seta"></div>
+        <div class="no">Importar no ArkTransp<small>arrastar cada arquivo no local indicado</small></div>
+        <div class="seta"></div>
+        <div class="ramo">
+          <div class="no decisao">Prévia sem alertas e checklist do dia completo?</div>
+          <span>não →</span>
+          <div class="no">Reexportar o arquivo certo</div>
+        </div>
+        <div class="sim-nao">sim</div>
+        <div class="seta"></div>
+        <div class="raias">
+          <div class="raia">
+            <b>Integrações de NF</b>
+            <div class="no decisao">Nota não integrada?</div>
+            <div class="sim-nao">sim</div>
+            <div class="seta"></div>
+            <div class="no acao">Verificar com o Fiscal e registrar a tratativa</div>
+          </div>
+          <div class="raia">
+            <b>Entregas e SLA</b>
+            <div class="no decisao">Vencida ou em atraso?</div>
+            <div class="sim-nao">sim</div>
+            <div class="seta"></div>
+            <div class="no acao">Cobrar a transportadora e avisar o Atendimento</div>
+          </div>
+          <div class="raia">
+            <b>Baixa Zendesk</b>
+            <div class="no decisao">Todas as NFs do ticket entregues?</div>
+            <div class="sim-nao">sim</div>
+            <div class="seta"></div>
+            <div class="no acao">Gerar e importar a baixa em massa</div>
+          </div>
+        </div>
+        <div class="seta" style="margin-top:6px"></div>
+        <div class="no">Acompanhar os indicadores<small>Painel de SLA · histórico mensal no Banco de dados</small></div>
+        <div class="seta"></div>
+        <div class="no terminal">Fim do dia</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 =================================================================== -->
+  <section class="longa">
+    <h2><span class="n">10</span>Descrição das etapas</h2>
+    <div class="tabela-rolagem">
+    <table>
+      <thead><tr><th class="centro">Nº</th><th>Etapa</th><th>Descrição da atividade</th><th>Responsável</th><th>Sistema / Documento</th><th>Prazo</th></tr></thead>
+      <tbody>
+        <tr><td class="centro">1</td><td><b>Exportar relatórios</b></td><td>Exportar Alloca07, Intelipost (envios e transações), SPfly, Jamef, Certex, Aging do Zendesk e a aba Base_Dados dos romaneios. O período deve cobrir o mês corrente. A Jamef exporta no máximo 30 dias por arquivo, então podem ser necessários vários.</td><td>Analista de Logística</td><td>Protheus, Intelipost, portais das transportadoras, Zendesk Explore</td><td>Diário, até <span class="preencher">09h00</span></td></tr>
+        <tr><td class="centro">2</td><td><b>Importar no ArkTransp</b></td><td>Arrastar cada arquivo no local indicado e conferir a prévia: quantidade de linhas e alertas (arquivo já enviado hoje, período incompleto, datas antigas, transportadora errada). Ao final, o checklist "Planilhas do dia" da tela Início deve estar completo.</td><td>Analista de Logística</td><td>ArkTransp</td><td>Logo após a etapa 1</td></tr>
+        <tr><td class="centro">3</td><td><b>Conferir integrações de NF</b></td><td>Na tela Integrações de NF, filtrar "Não integrada". Para cada nota, verificar o motivo com o Fiscal e registrar a tratativa (comentário, PDV, nota antiga e nota nova). Investigar também as notas "Só Intelipost" e as marcadas como anormais (emissão e integração em dias diferentes).</td><td>Analista de Logística</td><td>ArkTransp (Integrações de NF)</td><td>Diário (D+1 da emissão)</td></tr>
+        <tr><td class="centro">4</td><td><b>Acompanhar entregas e SLA</b></td><td>No Painel de SLA, verificar as notas vencidas e os tickets em atraso sem entrega, copiar os números e cobrar a transportadora. Quando houver uma lista de NFs para conferir, usar a tela Entregas.</td><td>Analista de Logística</td><td>ArkTransp (Painel e Entregas), e-mail/portal da transportadora</td><td>Diário</td></tr>
+        <tr><td class="centro">5</td><td><b>Dar baixa nos tickets</b></td><td>Na Baixa Zendesk, abrir a aba "Já entregues — dar baixa", conferir os tickets, gerar a planilha de baixa em massa e importá-la no Zendesk. Critério: todas as NFs do ticket entregues e romaneio com NF em todas as linhas.</td><td>Analista de Logística</td><td>ArkTransp (Baixa Zendesk), Zendesk</td><td>Diário</td></tr>
+        <tr><td class="centro">6</td><td><b>Divulgar indicadores</b></td><td>Exportar o Painel de SLA e o mês no Banco de dados e enviar aos interessados (seção 8), com destaque para transportadoras e regiões abaixo da meta.</td><td>Analista de Logística</td><td>ArkTransp, Excel</td><td>Semanal e mensal, até o <span class="preencher">5º dia útil</span></td></tr>
+        <tr><td class="centro">7</td><td><b>Fazer backup</b></td><td>No Banco de dados, exportar o histórico completo e guardar na pasta de rede da área.</td><td>Analista de Logística</td><td>ArkTransp, <span class="preencher">pasta de rede</span></td><td>Mensal</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <!-- 11 =================================================================== -->
+  <section class="longa">
+    <h2><span class="n">11</span>Decisões e exceções</h2>
+    <table>
+      <thead><tr><th style="width:38%">Situação</th><th>Tratativa</th></tr></thead>
+      <tbody>
+        <tr><td>Nota emitida hoje</td><td>Fica fora do cruzamento até o dia seguinte, para não aparecer como pendência antes de ter tempo de integrar.</td></tr>
+        <tr><td>Nota de remanejamento fiscal</td><td>Fora do cruzamento (não gera transporte).</td></tr>
+        <tr><td>NF principal ausente, mas NF triangular presente na Intelipost</td><td>Considerada integrada.</td></tr>
+        <tr><td>Emissão e integração em dias diferentes</td><td>Marcada como anormal. Verificar o motivo do atraso na integração.</td></tr>
+        <tr><td>NF "Só Intelipost"</td><td>Verificar se é nota cancelada, de outra emitente ou digitada errado.</td></tr>
+        <tr><td>Ticket com só parte das NFs entregues</td><td>Não dar baixa. O ticket aguarda até todas as NFs serem entregues.</td></tr>
+        <tr><td>Romaneio sem NF em alguma linha</td><td>Completar a planilha Base_Dados com a Expedição antes da baixa.</td></tr>
+        <tr><td>Status diferente entre as fontes de entrega</td><td>Vale o mais avançado: entregue › entregue no mesmo dia › devolvida › em trânsito › sem rastreio.</td></tr>
+        <tr><td>Transportadora não informou previsão</td><td>A nota aparece como "Sem previsão" e não entra no % de SLA. Cobrar a previsão da transportadora.</td></tr>
+        <tr><td>Devolução</td><td>Não entra no % de SLA. Tratar com a transportadora e avisar o Atendimento.</td></tr>
+        <tr><td>Frota interna e Lalamove</td><td>Acompanhadas em abas próprias na Baixa Zendesk, fora do SLA das transportadoras.</td></tr>
+        <tr><td>Planilha errada importada</td><td>Importar a correta no mesmo local. Ela substitui a anterior sem duplicar.</td></tr>
+        <tr><td>Mês com feriados</td><td>O sistema conta só segunda a sexta. Considerar os feriados na análise dos atrasos.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 12 =================================================================== -->
+  <section class="longa">
+    <h2><span class="n">12</span>Riscos e controles</h2>
+    <div class="tabela-rolagem">
+    <table>
+      <thead><tr><th>Risco</th><th>Impacto</th><th>Controle preventivo</th><th>Controle detectivo</th></tr></thead>
+      <tbody>
+        <tr><td>Planilha não importada ou desatualizada</td><td>Indicadores e pendências errados</td><td>Rotina diária com horário definido</td><td>Checklist "Planilhas do dia" aponta o que falta ou está desatualizado</td></tr>
+        <tr><td>Arquivo incompleto ou da transportadora errada</td><td>Entregas e SLA distorcidos</td><td>Exportar sempre o mês corrente completo</td><td>Prévia da importação com alertas antes de gravar</td></tr>
+        <tr><td>NF não integrada sem tratativa</td><td>Entrega sem rastreio e sem cobrança</td><td>Conferência diária (etapa 3)</td><td>Filtro de tratativa pendente na tela Integrações de NF</td></tr>
+        <tr><td>Baixa indevida de ticket</td><td>Cliente sem entrega com ticket fechado</td><td>Ticket só fica pronto com todas as NFs entregues</td><td>Conferência por amostragem antes de importar a baixa</td></tr>
+        <tr><td>Perda do histórico</td><td>Sem base para indicadores mensais</td><td>Backup mensal em Excel (etapa 7)</td><td>Painel do Banco de dados mostra os meses guardados</td></tr>
+        <tr><td>Dependência de uma máquina ou pessoa</td><td>Rotina parada na ausência do responsável</td><td>Treinamento (seção 15) e migração da base para o servidor</td><td>Revisão semestral deste documento</td></tr>
+        <tr><td>Mudança de layout nos relatórios de origem</td><td>Importação incompleta</td><td>Comunicar mudanças dos sistemas de origem ao dono do processo</td><td>Prévia mostra quantas linhas foram reconhecidas</td></tr>
+        <tr><td>Exposição de dados de clientes</td><td>Vazamento de informação</td><td>Planilhas processadas só no computador, sem conexão externa</td><td>—</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <!-- 13 =================================================================== -->
+  <section class="longa">
+    <h2><span class="n">13</span>Indicadores</h2>
+    <div class="tabela-rolagem">
+    <table>
+      <thead><tr><th>KPI</th><th>Fórmula</th><th>Meta</th><th>Frequência</th><th>Fonte dos dados</th></tr></thead>
+      <tbody>
+        <tr><td><b>% dentro do SLA</b></td><td>Entregues no prazo ÷ (no prazo + com atraso + vencidas)</td><td><span class="faixa verde">≥ 95%</span><br><span class="faixa amarelo">85% a 95%</span><br><span class="faixa vermelho">&lt; 85%</span></td><td>Diária, consolidada por semana e mês, por transportadora e região</td><td>Relatórios SPfly, Jamef e Certex</td></tr>
+        <tr><td><b>Entregas vencidas</b></td><td>Notas com previsão anterior a hoje e sem entrega</td><td>0</td><td>Diária</td><td>Relatórios das transportadoras</td></tr>
+        <tr><td><b>Atraso médio</b></td><td>Média de dias úteis entre previsão e entrega das notas com atraso</td><td><span class="preencher">definir</span></td><td>Mensal</td><td>Relatórios das transportadoras</td></tr>
+        <tr><td><b>% de NFs integradas</b></td><td>NFs integradas ÷ NFs do período (sem remanejamento e sem as emitidas hoje)</td><td><span class="preencher">definir (ex.: 100%)</span></td><td>Diária</td><td>Alloca07 + Intelipost</td></tr>
+        <tr><td><b>NFs não integradas sem tratativa</b></td><td>Contagem de notas não integradas sem tratativa registrada</td><td>0</td><td>Diária</td><td>ArkTransp (Integrações de NF)</td></tr>
+        <tr><td><b>% de NFs entregues</b></td><td>NFs entregues ÷ NFs do período</td><td><span class="preencher">definir</span></td><td>Diária</td><td>Transações Intelipost + transportadoras</td></tr>
+        <tr><td><b>Tickets prontos para baixa em aberto</b></td><td>Tickets com todas as NFs entregues ainda abertos no Zendesk</td><td>0 ao fim do dia</td><td>Diária</td><td>Zendesk + romaneios + entregas</td></tr>
+        <tr><td><b>Lead time médio</b></td><td>Média de dias úteis entre a saída da Arklok e a entrega</td><td><span class="preencher">definir por região</span></td><td>Mensal</td><td>Relatório de Expedição + transportadoras</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <!-- 14 =================================================================== -->
+  <section>
+    <h2><span class="n">14</span>Documentos e links relacionados</h2>
+    <table>
+      <thead><tr><th style="width:18%">Tipo</th><th>Descrição</th><th>Link / Localização</th></tr></thead>
+      <tbody>
+        <tr><td>Documento</td><td>Guia do sistema ArkTransp (funcionalidades, planilhas, status e dúvidas)</td><td><a href="index.html">docs/index.html</a></td></tr>
+        <tr><td>Documento</td><td>Documento técnico do ArkTransp (regras de cálculo e plano de migração)</td><td><a href="tecnico.html">docs/tecnico.html</a></td></tr>
+        <tr><td>Formulário</td><td>Planilha de baixa em massa no modelo do Zendesk (gerada pelo ArkTransp)</td><td>ArkTransp → Baixa Zendesk</td></tr>
+        <tr><td>Planilha</td><td>NF dos romaneios (aba Base_Dados)</td><td><span class="preencher">inserir link</span></td></tr>
+        <tr><td>Planilha</td><td>Histórico mensal exportado (arktransp_banco_AAAA-MM.xlsx)</td><td><span class="preencher">pasta de rede</span></td></tr>
+        <tr><td>Outro</td><td>Endereço de acesso ao ArkTransp</td><td><span class="preencher">inserir link</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 15 =================================================================== -->
+  <section>
+    <h2><span class="n">15</span>Treinamento e comunicação</h2>
+    <ul>
+      <li><b>Apresentação inicial:</b> leitura do guia do sistema e demonstração das telas para toda a equipe de Logística.</li>
+      <li><b>Treinamento prático:</b> o novo usuário acompanha a rotina diária com um analista experiente por <span class="preencher">5 dias úteis</span> e depois executa sob supervisão.</li>
+      <li><b>Evidência:</b> lista de presença ou registro do treinamento em <span class="preencher">local de registro</span>.</li>
+      <li><b>Comunicação de mudanças:</b> alterações no processo ou no sistema são registradas no histórico de revisões (seção 17) e avisadas por <span class="preencher">canal de comunicação</span>.</li>
+      <li><b>Áreas parceiras:</b> Fiscal, Expedição e Atendimento recebem este documento e são informados sempre que sua parte no fluxo mudar.</li>
+    </ul>
+  </section>
+
+  <!-- 16 =================================================================== -->
+  <section>
+    <h2><span class="n">16</span>Auditoria e revisão</h2>
+    <table>
+      <tr><td class="rotulo">Revisão do documento</td><td>Semestral, ou antes se mudar o processo, um sistema de origem ou uma transportadora.</td></tr>
+      <tr><td class="rotulo">Responsável</td><td>Dono do processo. Auditoria independente por <span class="preencher">área de Processos / Qualidade</span>.</td></tr>
+      <tr><td class="rotulo">Verificações mensais</td><td>
+        <ul style="margin:0">
+          <li>Comparar o total de notas do mês no Banco de dados com a Alloca07.</li>
+          <li>Conferir por amostragem 10 tickets baixados contra o registro de entrega.</li>
+          <li>Verificar se todas as notas não integradas do mês têm tratativa.</li>
+        </ul>
+      </td></tr>
+      <tr><td class="rotulo">Evidências</td><td>Exportações mensais do Banco de dados, planilhas de baixa em massa importadas, tratativas registradas e indicadores divulgados.</td></tr>
+    </table>
+  </section>
+
+  <!-- 17 =================================================================== -->
+  <section>
+    <h2><span class="n">17</span>Histórico de revisões</h2>
+    <table>
+      <thead><tr><th style="width:12%">Versão</th><th style="width:16%">Data</th><th>Descrição da alteração</th><th style="width:22%">Responsável</th></tr></thead>
+      <tbody>
+        <tr><td>1.0</td><td>15/10/2026</td><td>Criação do documento.</td><td>Diogo Silva</td></tr>
+        <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 18 =================================================================== -->
+  <section>
+    <h2><span class="n">18</span>Validação e aprovação</h2>
+    <table class="assinaturas">
+      <thead><tr><th class="centro">Elaborado por</th><th class="centro">Revisado por</th><th class="centro">Aprovado por</th></tr></thead>
+      <tbody>
+        <tr><td class="centro">Diogo Silva / <span class="preencher">cargo</span></td><td class="centro"><span class="preencher">Nome / Cargo</span></td><td class="centro"><span class="preencher">Nome / Cargo</span></td></tr>
+        <tr><td class="centro" style="height:auto">15/10/2026</td><td class="centro" style="height:auto"><span class="preencher">Data / Assinatura</span></td><td class="centro" style="height:auto"><span class="preencher">Data / Assinatura</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 19 =================================================================== -->
+  <section>
+    <h2><span class="n">19</span>Checklist antes da publicação</h2>
+    <ul class="checklist">
+      <li><span class="marca-check">☐</span>Processo revisado/validado e responsáveis informados.</li>
+      <li><span class="marca-check">☐</span>Riscos, controles e indicadores avaliados.</li>
+      <li><span class="marca-check">☒</span>Fluxo do processo anexado ou inserido.</li>
+      <li><span class="marca-check">☒</span>Versão e próxima revisão preenchidas.</li>
+      <li><span class="marca-check">☐</span>Links e documentos conferidos.</li>
+      <li><span class="marca-check">☐</span>Aprovado para publicação no Portal de Processos.</li>
+    </ul>
+  </section>
+
+  <footer class="rodape-doc">
+    <span>Arklok · Operações e Logística · Documentação Indicadores Logística</span>
+    <span>Versão 1.0 · 15/10/2026</span>
+  </footer>
+
+</div>
+
+</body>
+</html>
